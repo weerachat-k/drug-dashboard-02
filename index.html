@@ -310,6 +310,10 @@ body {
 .table-toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; color: var(--text-muted); font-size: .88rem; }
 .table-toolbar label { display: inline-flex; align-items: center; gap: 6px; }
 .table-toolbar .inline-select { width: auto; padding: 6px 10px; }
+/* แถบปุ่มเหนือตาราง (ส่งออก CSV) */
+.table-actions { display: flex; justify-content: flex-end; margin-bottom: 8px; }
+.btn.btn-sm { padding: 5px 12px; font-size: .85rem; border-radius: 9px; }
+.btn.btn-sm .muted { font-size: .8rem; }
 .table-wrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: .9rem; }
 th, td { padding: 9px 10px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
@@ -1159,15 +1163,16 @@ function renderExpiry() {
     if (v === "attention") return l.qty > 0 && (s === "expired" || s === "near" || s === "quarantine");
     return s === v;
   }).map((l) => ({ ...l, name: l.drug.generic_name, category: l.drug.category, state: lotState(l) }));
-  dataTable($("expTable"), "exp", LOT_COLUMNS, rows, { sig: filterSig() + v, sortKey: "days", sortDir: 1, empty: "ไม่มีล็อตในกลุ่มนี้" });
+  dataTable($("expTable"), "exp", LOT_COLUMNS, rows, { sig: filterSig() + v, sortKey: "days", sortDir: 1, empty: "ไม่มีล็อตในกลุ่มนี้",
+    csv: { name: `lots_${v}`, extra: [{ label: "หน่วย", csv: (l) => l.drug.unit }, { label: "ต้นทุน/หน่วย", csv: (l) => l.cost }, { label: "stock_id", csv: (l) => l.id }] } });
 }
 const LOT_COLUMNS = [
   { key: "sku", label: "SKU", html: (l) => `<span class="mono">${esc(l.sku)}</span>` },
   { key: "name", label: "ชื่อสามัญ", html: (l) => `<strong>${esc(l.name)}</strong> <span class="muted">${esc(l.drug.strength)}</span>` },
   { key: "category", label: "หมวด", html: (l) => `<span class="pill">${esc(l.category)}</span>` },
   { key: "lot", label: "ล็อต", html: (l) => `<span class="mono">${esc(l.lot)}</span>` },
-  { key: "received", label: "รับเข้า", html: (l) => (l.received ? thDate(l.received) : "–"), sortVal: (l) => l.received || "" },
-  { key: "expiry", label: "หมดอายุ", html: (l) => (l.expiry ? thDate(l.expiry) : `<span class="tag">ไม่ระบุ</span>`), sortVal: (l) => l.expiry || "9999" },
+  { key: "received", label: "รับเข้า", html: (l) => (l.received ? thDate(l.received) : "–"), sortVal: (l) => l.received || "", csv: (l) => l.received || "" },
+  { key: "expiry", label: "หมดอายุ", html: (l) => (l.expiry ? thDate(l.expiry) : `<span class="tag">ไม่ระบุ</span>`), sortVal: (l) => l.expiry || "9999", csv: (l) => l.expiry || "" },
   { key: "days", label: "เหลือ (วัน)", num: true, sortVal: (l) => (l.days ?? 1e9), html: (l) => {
       if (l.days === null) return "–";
       const tone = l.days < 0 ? "danger" : l.days <= 30 ? "danger" : l.days <= state.nearDays ? "warn" : "";
@@ -1218,10 +1223,13 @@ function renderDispense() {
   $("dspView").value = state.dspView;
   const rows = all.filter((r) => ({ all: true, counted: counted(r), flagged: r.flags.length > 0, void: r.type === "void" })[state.dspView])
     .map((r) => ({ ...r, name: r.drug.generic_name }));
-  dataTable($("dspTable"), "dsp", DSP_COLUMNS, rows, { sig: filterSig() + state.dspView, sortKey: "ts", sortDir: -1, empty: "ไม่มีรายการจ่ายยาในช่วงนี้" });
+  dataTable($("dspTable"), "dsp", DSP_COLUMNS, rows, { sig: filterSig() + state.dspView, sortKey: "ts", sortDir: -1, empty: "ไม่มีรายการจ่ายยาในช่วงนี้",
+    csv: { name: `dispense_${state.dspView}`, period: true, extra: [
+      { label: "หน่วย", csv: (r) => r.drug.unit }, { label: "หมวด", csv: (r) => r.drug.category },
+      { label: "มูลค่าต้นทุน", csv: (r) => Math.round(r.value * 100) / 100 }, { label: "นับในสถิติ", csv: (r) => (counted(r) ? "ใช่" : "ไม่") }] } });
 }
 const DSP_COLUMNS = [
-  { key: "ts", label: "วันเวลา", html: (r) => `${thDate(r.day, { day: "numeric", month: "short" })} <span class="muted">${String(r.hour).padStart(2, "0")}:${String(r.minute).padStart(2, "0")}</span>` },
+  { key: "ts", label: "วันเวลา", html: (r) => `${thDate(r.day, { day: "numeric", month: "short" })} <span class="muted">${hhmm(r)}</span>`, csv: (r) => `${r.day} ${hhmm(r)}` },
   { key: "id", label: "รหัส", html: (r) => `<span class="mono">${esc(r.id)}</span>` },
   { key: "sku", label: "SKU", html: (r) => `<span class="mono">${esc(r.sku)}</span>` },
   { key: "name", label: "ชื่อสามัญ", html: (r) => `<strong>${esc(r.name)}</strong> <span class="muted">${esc(r.drug.strength)}</span>` },
@@ -1229,7 +1237,7 @@ const DSP_COLUMNS = [
   { key: "qty", label: "จำนวน", num: true, html: (r) => `${fmt(r.qty, 2)} <span class="muted">${esc(r.drug.unit)}</span>` },
   { key: "rx", label: "เภสัชกร", html: (r) => esc(r.rx) },
   { key: "type", label: "ประเภท", html: (r) => `<span class="tag ${r.type === "dispense" ? "ok" : ""}">${esc(DISP_TYPE[r.type] || r.type)}</span>` },
-  { key: "flags", label: "ข้อสังเกต", sortVal: (r) => r.flags.length, html: (r) => r.flags.map(([t, tone]) => `<span class="tag ${tone}">${esc(t)}</span>`).join("") || `<span class="muted">–</span>` },
+  { key: "flags", label: "ข้อสังเกต", sortVal: (r) => r.flags.length, csv: (r) => r.flags.map((f) => f[0]).join("; "), html: (r) => r.flags.map(([t, tone]) => `<span class="tag ${tone}">${esc(t)}</span>`).join("") || `<span class="muted">–</span>` },
 ];
 
 /* ----- heatmap: วันในสัปดาห์ × ชั่วโมง ----- */
@@ -1277,7 +1285,10 @@ function renderOrder() {
   $("orderNote").innerHTML = `<i class="ti ti-info-circle"></i> วิเคราะห์ ${fmt(rows.length)} SKU ที่มีข้อมูลสต็อกหรือการจ่าย · อีก ${fmt(noStock)} SKU ในบัญชียาไม่มีข้อมูลสต็อก · ยอดใช้ได้นับเฉพาะล็อต active ที่ยังไม่หมดอายุ`;
   const v = state.ordView;
   const shown = rows.filter((r) => v === "all" || (v === "action" ? ORDER_STATE[r.status].action : r.status === v));
-  dataTable($("ordTable"), "ord", ORDER_COLUMNS, shown, { sig: filterSig() + v, sortKey: "rank", sortDir: 1, empty: "ไม่มี SKU ที่ต้องดำเนินการ" });
+  dataTable($("ordTable"), "ord", ORDER_COLUMNS, shown, { sig: filterSig() + v, sortKey: "rank", sortDir: 1, empty: "ไม่มี SKU ที่ต้องดำเนินการ",
+    csv: { name: `order_${v}`, period: true, extra: [
+      { label: "หน่วย", csv: (r) => r.drug.unit }, { label: "กักกัน", csv: (r) => r.held },
+      { label: "เป้าหมาย (วัน)", csv: () => state.coverDays }] } });
 }
 const ORDER_COLUMNS = [
   { key: "sku", label: "SKU", html: (r) => `<span class="mono">${esc(r.sku)}</span>` },
@@ -1286,7 +1297,7 @@ const ORDER_COLUMNS = [
   { key: "usable", label: "คงเหลือใช้ได้", num: true, html: (r) => `${fmt(r.usable)} <span class="muted">${esc(r.drug.unit)}</span>` + (r.held ? `<br><span class="muted">+ กักกัน ${fmt(r.held)}</span>` : "") },
   { key: "used", label: "จ่ายในช่วงนี้", num: true, html: (r) => fmt(r.used, 1) },
   { key: "avg", label: "เฉลี่ย/วัน", num: true, html: (r) => fmt(r.avg, 1) },
-  { key: "cover", label: "พอใช้ (วัน)", num: true, sortVal: (r) => (r.cover === Infinity ? 1e9 : r.cover), html: (r) => {
+  { key: "cover", label: "พอใช้ (วัน)", num: true, sortVal: (r) => (r.cover === Infinity ? 1e9 : r.cover), csv: (r) => (r.cover === Infinity ? "" : Math.round(r.cover)), html: (r) => {
       if (r.cover === Infinity) return `<span class="muted">–</span>`;
       const tone = r.cover < state.coverDays / 2 ? "danger" : r.cover < state.coverDays ? "warn" : "ok";
       return `<span class="tag ${tone}">${fmt(r.cover, 0)}</span>`;
@@ -1314,19 +1325,20 @@ function renderQuality() {
     kpi("ti-wand", "แก้อัตโนมัติ/ข้อมูล", fmt(c("info")), "เช่น แปลงรูปแบบวันที่");
 
   dataTable($("safetyTable"), "safety", SAFETY_COLUMNS, safety.map((r) => ({ ...r, name: r.drug.generic_name, late: r.expiredLot.late })),
-    { sig: "safety", sortKey: "ts", sortDir: 1, empty: "ไม่พบการจ่ายยาจากล็อตที่หมดอายุ" });
+    { sig: "safety", sortKey: "ts", sortDir: 1, empty: "ไม่พบการจ่ายยาจากล็อตที่หมดอายุ", csv: { name: "safety_expired_dispense" } });
 
   $("qView").innerHTML = [["all", "ทั้งหมด"], ...Object.entries(SEV).map(([k, v]) => [k, v.label])].map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
   $("qView").value = state.qView;
   const rows = ISSUES.filter((i) => state.qView === "all" || i.sev === state.qView).map((i) => ({ ...i, rank: SEV[i.sev].rank }));
-  dataTable($("qTable"), "q", ISSUE_COLUMNS, rows, { sig: state.qView, sortKey: "rank", sortDir: 1, empty: "ไม่พบปัญหาในข้อมูล 🎉" });
+  dataTable($("qTable"), "q", ISSUE_COLUMNS, rows, { sig: state.qView, sortKey: "rank", sortDir: 1, empty: "ไม่พบปัญหาในข้อมูล 🎉",
+    csv: { name: `data_issues_${state.qView}` } });
 }
 const SAFETY_COLUMNS = [
-  { key: "ts", label: "วันที่จ่าย", html: (r) => thDate(r.day) },
+  { key: "ts", label: "วันที่จ่าย", html: (r) => thDate(r.day), csv: (r) => `${r.day} ${hhmm(r)}` },
   { key: "id", label: "รหัส", html: (r) => `<span class="mono">${esc(r.id)}</span>` },
   { key: "name", label: "ยา", html: (r) => `<strong>${esc(r.name)}</strong> <span class="muted">${esc(r.drug.strength)}</span>` },
   { key: "lot", label: "ล็อต", html: (r) => `<span class="mono">${esc(r.lot)}</span>` },
-  { key: "expiry", label: "หมดอายุ", sortVal: (r) => r.expiredLot.expiry, html: (r) => thDate(r.expiredLot.expiry) },
+  { key: "expiry", label: "หมดอายุ", sortVal: (r) => r.expiredLot.expiry, html: (r) => thDate(r.expiredLot.expiry), csv: (r) => r.expiredLot.expiry },
   { key: "late", label: "เกินมา (วัน)", num: true, html: (r) => `<span class="tag danger">${fmt(r.late)}</span>` },
   { key: "rx", label: "เภสัชกร", html: (r) => esc(r.rx) },
   { key: "incident", label: "รายงานเหตุการณ์", sortVal: (r) => r.incident || "", html: (r) => (r.incident ? `<span class="tag info">${esc(r.incident)}</span>` : `<span class="tag danger">ยังไม่มีรายงาน</span>`) },
@@ -1375,8 +1387,15 @@ function dataTable(el, id, columns, rows, opts = {}) {
         `<td class="${c.num ? "num" : ""} ${c.wrap ? "wrap" : ""}">${c.html ? c.html(r) : esc(r[c.key])}</td>`).join("")}</tr>`).join("")
     : `<tr><td colspan="${columns.length}" class="no-result"><i class="ti ti-mood-empty"></i> ${esc(opts.empty || "ไม่พบรายการ")}</td></tr>`;
 
-  el.innerHTML = `<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>
+  // ปุ่มส่งออก CSV (ส่งออกทุกแถวที่ผ่านตัวกรอง ตามลำดับที่เรียงอยู่ ไม่ใช่เฉพาะหน้าปัจจุบัน)
+  const actions = opts.csv
+    ? `<div class="table-actions"><button type="button" class="btn btn-sm csv-btn" ${sorted.length ? "" : "disabled"}>
+        <i class="ti ti-file-spreadsheet"></i>ส่งออก CSV <span class="muted">(${fmt(sorted.length)} รายการ)</span></button></div>`
+    : "";
+  el.innerHTML = `${actions}<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>
     <nav class="pager" aria-label="เปลี่ยนหน้า">${sorted.length ? pagerHtml(t, sorted.length, start, pageRows.length, pages) : ""}</nav>`;
+  const csvBtn = el.querySelector(".csv-btn");
+  if (csvBtn) csvBtn.addEventListener("click", () => exportCsv(opts.csv, columns, sorted));
 
   el.querySelectorAll("th").forEach((th) => {
     const sort = () => {
@@ -1410,6 +1429,40 @@ function pagerHtml(t, total, start, count, pages) {
       ${btn('<i class="ti ti-chevrons-right"></i>', pages, { disabled: cur === pages, aria: "หน้าสุดท้าย" })}
     </div>`;
 }
+
+/* =========================================================
+   ส่งออก CSV
+   ค่าในแต่ละคอลัมน์: c.csv(r) ถ้ามี → ค่าดิบถ้าเป็นคอลัมน์ตัวเลข → ข้อความที่แสดงในตาราง (ตัด HTML ออก)
+   cfg = { name: ชื่อไฟล์, extra: [{ label, csv }] คอลัมน์เพิ่มเติมเฉพาะใน CSV, period: true = ใส่ช่วงวันที่ในชื่อไฟล์ }
+   ========================================================= */
+const stripHtml = (html) => { const d = document.createElement("div"); d.innerHTML = html; return d.textContent.replace(/\s+/g, " ").trim(); };
+function csvValue(c, r) {
+  let v;
+  if (c.csv) v = c.csv(r);
+  else if (c.num) v = r[c.key];
+  else v = c.html ? stripHtml(c.html(r)) : r[c.key];
+  if (typeof v === "number") return Number.isFinite(v) ? (Number.isInteger(v) ? v : Math.round(v * 100) / 100) : "";
+  return v ?? "";
+}
+function csvCell(v) {
+  if (typeof v === "number") return String(v);
+  let s = String(v);
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;          // กันสูตรใน Excel (CSV injection)
+  return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+function exportCsv(cfg, columns, rows) {
+  const cols = [...columns.map((c) => ({ label: c.csvLabel || c.label, get: (r) => csvValue(c, r) })),
+    ...(cfg.extra || []).map((x) => ({ label: x.label, get: (r) => x.csv(r) ?? "" }))];
+  const lines = [cols.map((c) => csvCell(c.label)).join(",")]
+    .concat(rows.map((r) => cols.map((c) => csvCell(c.get(r))).join(",")));
+  const blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });   // BOM ให้ Excel อ่านภาษาไทยถูก
+  const file = `dashboard02_${cfg.name}` + (cfg.period ? `_${state.from}_${state.to}` : `_${ASOF}`) + ".csv";
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = file;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+const hhmm = (r) => `${String(r.hour).padStart(2, "0")}:${String(r.minute).padStart(2, "0")}`;
 
 /* =========================================================
    tooltip
