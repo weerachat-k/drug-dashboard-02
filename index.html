@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard คลังยาและการจ่ายยา</title>
+
+<!-- ===== ฟอนต์ Sarabun จาก Google Fonts ===== -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- ===== ไอคอน Tabler Icons (webfont) ===== -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+
+<style>
+/* =========================================================
+   ตัวแปรสี (CSS variables) — ชุดเดียวกับ Dashboard01
+   ========================================================= */
+:root {
+  --bg: #f1f3f6;
+  --surface: #ffffff;
+  --surface-2: #f7f8fa;
+  --border: #e3e6eb;
+  --text: #1d2433;
+  --text-muted: #667085;
+  --accent: #2f6fde;
+  --accent-soft: #e6eefc;
+  --track: #edf0f4;
+  --danger: #c62828;
+  --danger-bg: #fdecec;
+  --danger-border: #f3b4b4;
+  --warn: #b45309;
+  --warn-bg: #fef3e2;
+  --ok: #15803d;
+  --ok-bg: #e7f6ec;
+  --seg-text: #ffffff;
+  --hero-1: #2f6fde;
+  --hero-2: #12a594;
+  --hero-text: #ffffff;
+  --hero-shadow: rgba(47,111,222,.28);
+  --shadow: 0 1px 2px rgba(16,24,40,.05), 0 2px 8px rgba(16,24,40,.05);
+  --radius: 14px;
+  --c1: #2f6fde;
+  --c2: #12a594;
+  --c3: #e6883a;
+  --c4: #a35bd6;
+  --c5: #d6496b;
+  --c6: #8a94a6;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #0f141c;
+  --surface: #171e29;
+  --surface-2: #1d2532;
+  --border: #2a3342;
+  --text: #e6e9ef;
+  --text-muted: #98a2b3;
+  --accent: #5b93f0;
+  --accent-soft: #1f2d45;
+  --track: #232c3a;
+  --danger: #ff8a80;
+  --danger-bg: #3a1a1c;
+  --danger-border: #6e2b2f;
+  --warn: #f5b25c;
+  --warn-bg: #3a2a12;
+  --ok: #5fd08a;
+  --ok-bg: #12301e;
+  --seg-text: #0f141c;
+  --hero-1: #1e3f8f;
+  --hero-2: #0d5f57;
+  --hero-text: #f1f5fb;
+  --hero-shadow: rgba(0,0,0,.45);
+  --shadow: 0 1px 2px rgba(0,0,0,.4);
+  --c1: #5b93f0;
+  --c2: #2fc4b0;
+  --c3: #f0a05e;
+  --c4: #bf86ea;
+  --c5: #ee6f8f;
+  --c6: #8f99ab;
+  color-scheme: dark;
+}
+
+/* =========================================================
+   โครงหน้าโดยรวม
+   ========================================================= */
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: "Sarabun", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.5;
+  transition: background .2s, color .2s;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 20px 16px 40px; }
+.ti { font-size: 1.15em; vertical-align: -0.15em; }
+
+/* ----- ส่วนหัว (แบนเนอร์ไล่สี) ----- */
+.header {
+  position: relative; overflow: hidden; isolation: isolate;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+  margin-bottom: 16px; padding: 26px 28px; border-radius: 20px;
+  background: linear-gradient(135deg, var(--hero-1) 0%, var(--hero-2) 100%);
+  color: var(--hero-text);
+  box-shadow: 0 10px 30px var(--hero-shadow);
+}
+.header::before, .header::after {
+  content: ""; position: absolute; z-index: -1; border-radius: 50%;
+  background: rgba(255,255,255,.10); pointer-events: none;
+}
+.header::before { width: 320px; height: 320px; right: -80px; top: -160px; }
+.header::after  { width: 180px; height: 180px; right: 180px; bottom: -110px; background: rgba(255,255,255,.07); }
+.hero-main { display: flex; gap: 18px; align-items: flex-start; min-width: 0; flex: 1 1 520px; }
+.hero-icon {
+  flex: none; width: 60px; height: 60px; border-radius: 16px;
+  display: grid; place-items: center; font-size: 32px;
+  background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.25);
+}
+.hero-icon .ti { font-size: 32px; vertical-align: 0; }
+.hero-eyebrow {
+  font-size: .78rem; font-weight: 600; letter-spacing: .6px; text-transform: uppercase;
+  opacity: .85; display: flex; align-items: center; gap: 6px;
+}
+.header h1 { margin: 2px 0 0; font-size: 1.9rem; font-weight: 700; line-height: 1.25; letter-spacing: .2px; }
+.hero-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.hero-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 12px; border-radius: 999px; font-size: .86rem;
+  background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.28);
+}
+.hero-chip strong { font-weight: 700; font-variant-numeric: tabular-nums; }
+.note { font-size: .8rem; margin-top: 10px; max-width: 760px; opacity: .8; }
+/* ปุ่มบนแบนเนอร์ (ลิงก์ไป Dashboard01 + สลับธีม) */
+.hero-actions { display: flex; flex-direction: column; align-items: stretch; gap: 8px; flex: none; }
+.header .btn {
+  flex: none; color: var(--hero-text); font-weight: 600; justify-content: center;
+  background: rgba(255,255,255,.15); border-color: rgba(255,255,255,.4);
+  backdrop-filter: blur(6px);
+}
+.header .btn:hover { background: rgba(255,255,255,.28); border-color: rgba(255,255,255,.7); }
+.header .btn:focus-visible { outline-color: #fff; }
+
+/* ----- ปุ่มทั่วไป ----- */
+.btn {
+  font: inherit; cursor: pointer; text-decoration: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 14px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  transition: background .15s, border-color .15s;
+}
+.btn:hover { background: var(--surface-2); border-color: var(--accent); }
+.btn:focus-visible, select:focus-visible, input:focus-visible, button:focus-visible, a:focus-visible {
+  outline: 2px solid var(--accent); outline-offset: 2px;
+}
+
+/* ----- การ์ด ----- */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px;
+}
+.card + .card { margin-top: 12px; }
+.card-title {
+  margin: 0 0 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border);
+  font-size: 1.18rem; font-weight: 700; line-height: 1.3; letter-spacing: .1px; color: var(--text);
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.card-title > .ti:first-child {
+  flex: none; width: 34px; height: 34px; border-radius: 10px;
+  display: grid; place-items: center; font-size: 1.15rem;
+  background: var(--accent-soft); color: var(--accent);
+}
+.card-title .hint {
+  margin-left: auto; font-size: .8rem; font-weight: 500; color: var(--text-muted);
+  background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px; padding: 2px 10px;
+}
+
+/* ----- แถวตัวกรอง ----- */
+.filters {
+  display: grid; grid-template-columns: 1.6fr 1fr 1.2fr auto;
+  gap: 12px; align-items: end; margin-bottom: 12px;
+}
+.field label, .field .field-label { display: block; font-size: .82rem; color: var(--text-muted); margin-bottom: 4px; }
+.field select, .field input, .inline-select {
+  width: 100%; font: inherit; color: var(--text);
+  background: var(--surface-2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px 10px;
+}
+.search-wrap { position: relative; }
+.search-wrap .ti { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.search-wrap input { padding-left: 34px; }
+/* ช่วงวันที่ + ปุ่มช่วงด่วน */
+.date-range { display: flex; align-items: center; gap: 6px; }
+.date-range input { min-width: 0; }
+.presets { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+.chip-btn {
+  font: inherit; font-size: .78rem; padding: 1px 10px; border-radius: 999px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface); color: var(--text-muted);
+}
+.chip-btn:hover { border-color: var(--accent); color: var(--text); }
+.chip-btn.active { background: var(--accent-soft); color: var(--accent); border-color: var(--accent); font-weight: 600; }
+
+/* ----- แท็บ ----- */
+.tabs {
+  display: flex; gap: 4px; margin-bottom: 16px; padding: 4px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  overflow-x: auto; scrollbar-width: thin;
+}
+.tab {
+  font: inherit; color: var(--text-muted); background: none; border: 0; cursor: pointer;
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  padding: 8px 12px; border-radius: 9px; transition: background .15s, color .15s;
+}
+.tab:hover { color: var(--text); background: var(--surface-2); }
+.tab[aria-selected="true"] { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.badge {
+  font-size: .75rem; font-weight: 600; min-width: 22px; padding: 0 7px; border-radius: 999px;
+  background: var(--track); color: var(--text-muted); text-align: center; font-variant-numeric: tabular-nums;
+}
+.badge.danger { background: var(--danger-bg); color: var(--danger); }
+.badge.warn { background: var(--warn-bg); color: var(--warn); }
+.tab-panel[hidden] { display: none; }
+
+/* ----- แถบตั้งค่าของแต่ละแท็บ ----- */
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  margin-bottom: 12px; color: var(--text-muted); font-size: .88rem;
+}
+.panel-head .inline-select { width: auto; padding: 6px 10px; }
+.panel-head label { display: inline-flex; align-items: center; gap: 6px; }
+.panel-head .controls { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* ----- KPI ----- */
+.kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+.kpi .kpi-label { color: var(--text-muted); font-size: .92rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.kpi .kpi-icon {
+  width: 30px; height: 30px; border-radius: 8px; display: grid; place-items: center; flex: none;
+  background: var(--accent-soft); color: var(--accent);
+}
+.kpi .kpi-icon.danger { background: var(--danger-bg); color: var(--danger); }
+.kpi .kpi-icon.warn { background: var(--warn-bg); color: var(--warn); }
+.kpi .kpi-icon.ok { background: var(--ok-bg); color: var(--ok); }
+.kpi .kpi-value { font-size: 2rem; font-weight: 700; margin-top: 6px; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.kpi .kpi-sub { color: var(--text-muted); font-size: .82rem; margin-top: 4px; }
+
+/* ----- พื้นที่กราฟ ----- */
+.charts { display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; margin-bottom: 16px; }
+.charts.even { grid-template-columns: 1fr 1fr; }
+.charts .card + .card, .kpis .card + .card { margin-top: 0; }
+.section-gap { margin-bottom: 16px; }
+
+/* กราฟแท่งแนวนอน */
+.bars { display: flex; flex-direction: column; gap: 6px; }
+.bar-row {
+  display: grid; grid-template-columns: minmax(110px, 190px) 1fr; gap: 10px; align-items: center;
+  background: none; border: 0; padding: 3px 4px; border-radius: 8px;
+  font: inherit; color: inherit; text-align: left; cursor: pointer;
+  transition: opacity .2s, background .15s;
+}
+.bar-row.static { cursor: default; }
+.bar-row:hover { background: var(--surface-2); }
+.bar-row.dim { opacity: .35; }
+.bar-row.active .bar-label { font-weight: 700; }
+.bar-label { font-size: .88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bar-track { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.bar-fill { height: 20px; border-radius: 4px; background: var(--accent); min-width: 2px; transition: width .35s ease; }
+.bar-value { font-size: .85rem; font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; }
+
+/* กราฟแท่งแนวตั้ง: จำนวนการจ่ายยารายวัน */
+.cols { display: flex; align-items: flex-end; gap: 3px; height: 180px; border-bottom: 1px solid var(--border); }
+.col { flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; }
+.col-bar { width: 100%; background: var(--accent); border-radius: 3px 3px 0 0; min-height: 2px; transition: height .3s ease; }
+.col:hover .col-bar { filter: brightness(1.12); }
+.col.zero .col-bar { background: var(--track); }
+.col-labels { display: flex; gap: 3px; margin-top: 4px; }
+.col-labels span { flex: 1 1 0; min-width: 0; text-align: center; font-size: .7rem; color: var(--text-muted); white-space: nowrap; overflow: visible; }
+
+/* heatmap วันในสัปดาห์ × ชั่วโมง */
+.heat { display: grid; gap: 3px; font-size: .75rem; }
+.heat-h { text-align: center; color: var(--text-muted); }
+.heat-d { color: var(--text-muted); align-self: center; }
+.heat-cell {
+  height: 28px; border-radius: 5px; display: grid; place-items: center;
+  font-weight: 600; font-variant-numeric: tabular-nums; background: var(--surface-2);
+}
+
+/* กราฟแท่งซ้อน 100%: สถานะสต็อก */
+.stack-row { display: grid; grid-template-columns: 150px 1fr 130px; gap: 12px; align-items: center; margin-bottom: 10px; }
+.stack-label { font-weight: 600; font-size: .92rem; }
+.stack-label small { display: block; font-weight: 400; color: var(--text-muted); font-size: .78rem; }
+.stack { display: flex; gap: 2px; height: 32px; border-radius: 8px; overflow: hidden; background: var(--track); }
+.stack-seg {
+  font: inherit; border: 0; padding: 0 6px; min-width: 3px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; overflow: hidden; white-space: nowrap;
+  color: var(--seg-text); font-size: .82rem; font-weight: 700; transition: opacity .15s, filter .15s;
+}
+.stack-seg:hover { filter: brightness(1.08); }
+.stack-total { text-align: right; color: var(--text-muted); font-size: .85rem; font-variant-numeric: tabular-nums; }
+.stack-total strong { color: var(--text); display: block; font-size: .95rem; }
+.status-table { margin-top: 8px; }
+.status-table tr.clickable { cursor: pointer; }
+.status-table .swatch { display: inline-block; margin-right: 6px; vertical-align: -1px; }
+
+.empty { color: var(--text-muted); text-align: center; padding: 24px 8px; }
+
+/* ----- ตาราง ----- */
+.table-toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 12px; color: var(--text-muted); font-size: .88rem; }
+.table-toolbar label { display: inline-flex; align-items: center; gap: 6px; }
+.table-toolbar .inline-select { width: auto; padding: 6px 10px; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th, td { padding: 9px 10px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; }
+th { font-weight: 600; color: var(--text-muted); background: var(--surface-2); cursor: pointer; user-select: none; }
+th:hover { color: var(--text); }
+th .ti { opacity: .4; }
+th.sorted .ti { opacity: 1; color: var(--accent); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.wrap { white-space: normal; min-width: 260px; }
+tbody tr:hover { background: var(--surface-2); }
+tr.muted-row td { opacity: .55; }
+.mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .85rem; }
+.pill { display: inline-block; padding: 1px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: .8rem; }
+.tag {
+  display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .8rem; font-weight: 600;
+  background: var(--track); color: var(--text-muted);
+}
+.tag + .tag { margin-left: 4px; }
+.tag.danger { background: var(--danger-bg); color: var(--danger); }
+.tag.warn { background: var(--warn-bg); color: var(--warn); }
+.tag.ok { background: var(--ok-bg); color: var(--ok); }
+.tag.info { background: var(--accent-soft); color: var(--accent); }
+.muted { color: var(--text-muted); }
+.no-result { text-align: center; color: var(--text-muted); padding: 28px 8px; }
+
+/* แถบระดับสต็อกเทียบจุดสั่งซื้อ */
+.level { display: inline-flex; align-items: center; gap: 6px; }
+.level-track { width: 70px; height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; }
+.level-fill { height: 100%; border-radius: 4px; background: var(--ok); }
+.level-fill.warn { background: var(--warn); }
+.level-fill.danger { background: var(--danger); }
+
+/* ----- pagination ----- */
+.pager { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.pager-info { color: var(--text-muted); font-size: .88rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pager-info select {
+  font: inherit; color: var(--text); background: var(--surface-2);
+  border: 1px solid var(--border); border-radius: 8px; padding: 3px 6px;
+}
+.pager-btns { display: flex; gap: 4px; flex-wrap: wrap; }
+.pg {
+  font: inherit; min-width: 34px; height: 34px; padding: 0 8px;
+  border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface); color: var(--text); cursor: pointer;
+}
+.pg:hover:not(:disabled) { border-color: var(--accent); }
+.pg.current { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+.pg:disabled { opacity: .4; cursor: default; }
+.pg-gap { align-self: center; color: var(--text-muted); padding: 0 4px; }
+
+/* ----- tooltip ----- */
+.tooltip {
+  position: fixed; z-index: 50; pointer-events: none;
+  max-width: 300px; padding: 10px 12px; border-radius: 10px;
+  background: var(--text); color: var(--surface);
+  font-size: .82rem; line-height: 1.45; box-shadow: 0 6px 20px rgba(0,0,0,.2);
+  opacity: 0; transition: opacity .12s;
+}
+.tooltip.show { opacity: 1; }
+.tooltip strong { display: block; font-size: .9rem; margin-bottom: 2px; }
+
+/* ----- สถานะกำลังโหลด / ข้อผิดพลาด / คำเตือน ----- */
+.loading {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  padding: 60px 16px; color: var(--text-muted); font-size: 1.05rem;
+}
+.spinner {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 3px solid var(--border); border-top-color: var(--accent);
+  animation: spin .8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.error-box {
+  background: var(--danger-bg); border: 1px solid var(--danger-border); color: var(--danger);
+  border-radius: var(--radius); padding: 16px 18px; margin: 0 0 16px;
+}
+.error-box h2 { margin: 0 0 6px; font-size: 1.1rem; display: flex; gap: 8px; align-items: center; }
+.error-box h2 + p { margin-top: 0; }
+.error-box p { margin: 4px 0; color: var(--text); }
+.error-box ul { margin: 6px 0 0; padding-left: 20px; color: var(--text); }
+.error-box code, .warn-box code { font-family: ui-monospace, Consolas, monospace; background: var(--surface); padding: 0 4px; border-radius: 4px; }
+.warn-box {
+  background: var(--warn-bg); color: var(--warn); border-radius: 10px;
+  padding: 8px 12px; margin-bottom: 12px; font-size: .88rem;
+}
+.hidden { display: none !important; }
+
+/* =========================================================
+   รองรับหน้าจอขนาดเล็ก (แท็บเล็ต / มือถือ)
+   ========================================================= */
+@media (max-width: 900px) {
+  .filters { grid-template-columns: 1fr 1fr; }
+  .filters .field-period { grid-column: 1 / -1; }
+  .kpis { grid-template-columns: repeat(2, 1fr); }
+  .charts, .charts.even { grid-template-columns: 1fr; }
+}
+@media (max-width: 520px) {
+  .filters { grid-template-columns: 1fr; }
+  .filters .btn { justify-content: center; }
+  .kpis { grid-template-columns: 1fr 1fr; }
+  .kpi .kpi-value { font-size: 1.5rem; }
+  .header { padding: 20px 18px; border-radius: 16px; }
+  .header h1 { font-size: 1.35rem; }
+  .hero-main { gap: 12px; }
+  .hero-icon { width: 46px; height: 46px; border-radius: 12px; }
+  .hero-icon .ti { font-size: 24px; }
+  .hero-actions { width: 100%; }
+  .card-title { font-size: 1.05rem; }
+  .card-title .hint { margin-left: 0; }
+  .bar-row { grid-template-columns: 100px 1fr; }
+  .stack-row { grid-template-columns: 1fr auto; gap: 6px 10px; }
+  .stack-row .stack { order: 3; grid-column: 1 / -1; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ===== ส่วนหัว ===== -->
+  <header class="header">
+    <div class="hero-main">
+      <div class="hero-icon" aria-hidden="true"><i class="ti ti-building-warehouse"></i></div>
+      <div>
+        <div class="hero-eyebrow"><i class="ti ti-building-hospital"></i>แดชบอร์ดร้านยา · คลังยาและการจ่ายยา</div>
+        <h1 id="title">คลังยาและการจ่ายยา</h1>
+        <div class="hero-chips" id="heroStats"></div>
+        <div class="note" id="note"></div>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <!-- ลิงก์กลับไปยัง Dashboard01 (บัญชียา) ที่เผยแพร่บน GitHub Pages -->
+      <a class="btn" id="linkD01" href="https://weerachat-k.github.io/drug-dashboard/">
+        <i class="ti ti-arrow-back-up"></i>Dashboard บัญชียา (เดิม)
+      </a>
+      <button class="btn" id="themeBtn" type="button" aria-label="สลับโหมดมืด/สว่าง">
+        <i class="ti ti-moon" id="themeIcon"></i><span id="themeText">โหมดมืด</span>
+      </button>
+    </div>
+  </header>
+
+  <div class="loading" id="loading"><div class="spinner"></div>กำลังโหลดข้อมูล…</div>
+  <div class="error-box hidden" id="errorBox" role="alert"></div>
+
+  <main id="app" class="hidden">
+
+    <!-- ===== แถวตัวกรอง (ใช้ร่วมกันทุกแท็บ) ===== -->
+    <section class="card filters" aria-label="ตัวกรอง">
+      <div class="field field-period">
+        <span class="field-label"><i class="ti ti-calendar-event"></i> ช่วงเวลาการจ่ายยา</span>
+        <div class="presets" id="presets"></div>
+        <div class="date-range">
+          <input type="date" id="fFrom" aria-label="ตั้งแต่วันที่">
+          <span class="muted">–</span>
+          <input type="date" id="fTo" aria-label="ถึงวันที่">
+        </div>
+      </div>
+      <div class="field">
+        <label for="fCategory"><i class="ti ti-category"></i> หมวดยา</label>
+        <select id="fCategory"></select>
+      </div>
+      <div class="field">
+        <label for="fSearch"><i class="ti ti-search"></i> ค้นหา</label>
+        <div class="search-wrap">
+          <i class="ti ti-search"></i>
+          <input id="fSearch" type="search" placeholder="ชื่อสามัญ, SKU, ATC หรือเลขล็อต" autocomplete="off">
+        </div>
+      </div>
+      <button class="btn" id="clearBtn" type="button"><i class="ti ti-filter-off"></i>ล้างตัวกรอง</button>
+    </section>
+
+    <nav class="tabs" id="tabs" role="tablist" aria-label="มุมมอง"></nav>
+
+    <!-- ================= แท็บ: ภาพรวม ================= -->
+    <section class="tab-panel" id="panel-overview" role="tabpanel">
+      <div class="kpis" id="ovKpis"></div>
+      <div class="charts">
+        <div class="card">
+          <h2 class="card-title"><i class="ti ti-chart-bar"></i>จำนวนครั้งที่จ่ายยารายวัน<span class="hint" id="ovDailyHint"></span></h2>
+          <div id="ovDaily"></div>
+        </div>
+        <div class="card">
+          <h2 class="card-title"><i class="ti ti-category"></i>การจ่ายยาตามหมวด<span class="hint">คลิกเพื่อกรอง</span></h2>
+          <div class="bars" id="ovCats"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2 class="card-title"><i class="ti ti-calendar-stats"></i>สถานะสต็อกตามวันหมดอายุ<span class="hint">คลิกเพื่อดูรายละเอียด</span></h2>
+        <div id="ovStack"></div>
+      </div>
+    </section>
+
+    <!-- ================= แท็บ: วันหมดอายุ ================= -->
+    <section class="tab-panel" id="panel-expiry" role="tabpanel" hidden>
+      <div class="panel-head">
+        <span class="asof"></span>
+        <div class="controls">
+          <label>ใกล้หมดอายุภายใน <select class="inline-select" id="nearDays"></select></label>
+        </div>
+      </div>
+      <div class="kpis" id="expKpis"></div>
+      <div class="card section-gap">
+        <h2 class="card-title"><i class="ti ti-calendar-stats"></i>สัดส่วนสต็อกตามสถานะ<span class="hint">คลิกเพื่อกรองตาราง</span></h2>
+        <div id="expStack"></div>
+      </div>
+      <div class="card">
+        <h2 class="card-title"><i class="ti ti-list-details"></i>รายการล็อต</h2>
+        <div class="table-toolbar">
+          <label>แสดง <select class="inline-select" id="expView"></select></label>
+        </div>
+        <div id="expTable"></div>
+      </div>
+    </section>
+
+    <!-- ================= แท็บ: การจ่ายยา ================= -->
+    <section class="tab-panel" id="panel-dispense" role="tabpanel" hidden>
+      <div class="kpis" id="dspKpis"></div>
+      <div class="card section-gap">
+        <h2 class="card-title"><i class="ti ti-chart-bar"></i>จำนวนครั้งที่จ่ายยารายวัน<span class="hint" id="dspDailyHint"></span></h2>
+        <div id="dspDaily"></div>
+      </div>
+      <div class="charts even">
+        <div class="card">
+          <h2 class="card-title"><i class="ti ti-clock-hour-4"></i>ช่วงเวลาที่มีการจ่ายยา<span class="hint">จำนวนครั้ง · วัน × ชั่วโมง</span></h2>
+          <div id="dspHeat"></div>
+        </div>
+        <div class="card">
+          <h2 class="card-title"><i class="ti ti-pill"></i>ยาที่จ่ายบ่อย 10 อันดับ<span class="hint">คลิกเพื่อค้นหา</span></h2>
+          <div class="bars" id="dspTop"></div>
+        </div>
+      </div>
+      <div class="charts even">
+        <div class="card">
+          <h2 class="card-title"><i class="ti ti-category"></i>การจ่ายยาตามหมวด<span class="hint">คลิกเพื่อกรอง</span></h2>
+          <div class="bars" id="dspCats"></div>
+        </div>
+        <div class="card">
+          <h2 class="card-title"><i class="ti ti-user-check"></i>การจ่ายยาตามเภสัชกร</h2>
+          <div class="bars" id="dspRx"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h2 class="card-title"><i class="ti ti-receipt"></i>รายการจ่ายยา<span class="hint">ไม่แสดงรหัสผู้ป่วยเพื่อความเป็นส่วนตัว</span></h2>
+        <div class="table-toolbar">
+          <label>แสดง <select class="inline-select" id="dspView"></select></label>
+        </div>
+        <div id="dspTable"></div>
+      </div>
+    </section>
+
+    <!-- ================= แท็บ: การสั่งซื้อ ================= -->
+    <section class="tab-panel" id="panel-order" role="tabpanel" hidden>
+      <div class="panel-head">
+        <span id="orderNote"></span>
+        <div class="controls">
+          <label>เป้าหมายสต็อก <select class="inline-select" id="coverDays"></select></label>
+        </div>
+      </div>
+      <div class="kpis" id="ordKpis"></div>
+      <div class="card">
+        <h2 class="card-title"><i class="ti ti-shopping-cart"></i>สถานะการสั่งซื้อราย SKU<span class="hint">อัตราใช้คำนวณจากช่วงเวลาที่เลือก</span></h2>
+        <div class="table-toolbar">
+          <label>แสดง <select class="inline-select" id="ordView"></select></label>
+          <span><i class="ti ti-info-circle"></i> แนะนำสั่ง = ค่ามากกว่าระหว่าง (จุดสั่งซื้อ − คงเหลือ) และ (ใช้ต่อวัน × เป้าหมายวัน − คงเหลือ)</span>
+        </div>
+        <div id="ordTable"></div>
+      </div>
+    </section>
+
+    <!-- ================= แท็บ: คุณภาพข้อมูล ================= -->
+    <section class="tab-panel" id="panel-quality" role="tabpanel" hidden>
+      <div class="panel-head"><span><i class="ti ti-info-circle"></i> แท็บนี้ตรวจข้อมูลทั้งหมด ไม่ขึ้นกับตัวกรองด้านบน</span></div>
+      <div class="kpis" id="qKpis"></div>
+      <div class="card">
+        <h2 class="card-title"><i class="ti ti-shield-exclamation"></i>ความปลอดภัย: การจ่ายยาจากล็อตที่หมดอายุ</h2>
+        <div id="safetyTable"></div>
+      </div>
+      <div class="card">
+        <h2 class="card-title"><i class="ti ti-database-search"></i>ปัญหาในไฟล์ข้อมูล</h2>
+        <div class="table-toolbar">
+          <label>ระดับ <select class="inline-select" id="qView"></select></label>
+        </div>
+        <div id="qTable"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+/* =========================================================
+   ค่าคงที่ (กฎ/ป้ายกำกับ — ไม่ใช่ข้อมูล)
+   ========================================================= */
+const FILES = { drugs: "drugs.json", stock: "stock.json", disp: "dispense-log.json" };
+const DRUG_FIELDS = ["sku", "generic_name", "strength", "dosage_form", "unit", "category", "atc_code", "reorder_level"];
+const STOCK_FIELDS = ["stock_id", "sku", "lot", "received_date", "qty_on_hand", "unit_cost"];
+const DISP_FIELDS = ["dispense_id", "datetime", "sku", "lot", "qty"];
+const WEEKDAYS = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];          // getUTCDay(): 0 = อาทิตย์
+const WEEK_ORDER = [1, 2, 3, 4, 5, 6, 0];                         // แสดง จันทร์ → อาทิตย์
+const PRESETS = [{ n: 7, label: "7 วัน" }, { n: 14, label: "14 วัน" }, { n: 30, label: "30 วัน" }, { n: 0, label: "ทั้งหมด" }];
+
+// สถานะของล็อตในสต็อก (คำนวณจาก status + วันหมดอายุ)
+const LOT_STATE = {
+  ok:          { label: "ปกติ",            color: "var(--ok)",     tone: "ok" },
+  near:        { label: "ใกล้หมดอายุ",      color: "var(--warn)",   tone: "warn" },
+  expired:     { label: "หมดอายุแล้ว",      color: "var(--danger)", tone: "danger" },
+  quarantine:  { label: "กักกัน/รอตรวจ",   color: "var(--c4)",     tone: "" },
+  written_off: { label: "ตัดจำหน่ายแล้ว",   color: "var(--c6)",     tone: "" },
+};
+const STOCK_STATUS = { active: "ใช้งาน", quarantine: "กักกัน", written_off: "ตัดจำหน่าย" };
+const DISP_TYPE = { dispense: "จ่ายยา", void: "ยกเลิก", return: "คืนยา" };
+// สถานะการสั่งซื้อ (action = ต้องดำเนินการ)
+const ORDER_STATE = {
+  out:   { label: "หมดสต็อก",            tone: "danger", rank: 0, action: true },
+  below: { label: "ต่ำกว่าจุดสั่งซื้อ",     tone: "danger", rank: 1, action: true },
+  cover: { label: "พอใช้ไม่ถึงเป้าหมาย",   tone: "warn",   rank: 2, action: true },
+  idle:  { label: "ไม่มีการจ่ายในช่วงนี้",  tone: "",       rank: 3, action: false },
+  ok:    { label: "เพียงพอ",             tone: "ok",     rank: 4, action: false },
+};
+const SEV = { error: { label: "ผิดพลาด", tone: "danger", rank: 0 }, warn: { label: "ต้องตรวจสอบ", tone: "warn", rank: 1 }, info: { label: "แก้อัตโนมัติ/ข้อมูล", tone: "info", rank: 2 } };
+const TABS = [
+  { key: "overview", label: "ภาพรวม",        icon: "ti-layout-dashboard" },
+  { key: "expiry",   label: "วันหมดอายุ",     icon: "ti-calendar-x" },
+  { key: "dispense", label: "การจ่ายยา",      icon: "ti-receipt" },
+  { key: "order",    label: "การสั่งซื้อ",     icon: "ti-shopping-cart" },
+  { key: "quality",  label: "คุณภาพข้อมูล",   icon: "ti-database-search" },
+];
+
+/* =========================================================
+   ข้อมูลและสถานะของแอป
+   ========================================================= */
+let DRUGS = new Map();     // sku → ยา
+let CATEGORIES = [];       // หมวด (จาก meta.categories + ที่พบในข้อมูล)
+let LOTS = [];             // ล็อตที่ผ่านการตรวจ
+let DISP = [];             // รายการจ่ายยาที่ผ่านการตรวจ (มีวันที่ถูกต้อง)
+let ISSUES = [];           // ปัญหาข้อมูลทั้งหมด
+let META = {};             // meta ของแต่ละไฟล์
+let ASOF = "";             // วันที่ของข้อมูล (YYYY-MM-DD)
+let RANGE = { min: "", max: "" };   // ช่วงวันที่ของรายการจ่ายที่ใช้ได้
+
+const state = {
+  from: "", to: "",        // ช่วงเวลา
+  category: "", q: "",     // ตัวกรอง
+  tab: "overview",
+  nearDays: 90,            // เกณฑ์ใกล้หมดอายุ
+  coverDays: 30,           // เป้าหมายจำนวนวันที่ยาควรพอใช้
+  expView: "attention", dspView: "all", ordView: "action", qView: "all",
+};
+const tables = {};
+
+/* =========================================================
+   ฟังก์ชันช่วยทั่วไป
+   ========================================================= */
+const $ = (id) => document.getElementById(id);
+const fmt = (n, d = 0) => Number(n).toLocaleString("th-TH", { maximumFractionDigits: d });
+const money = (n) => Number(n).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const pct = (a, b) => (b ? (a / b) * 100 : 0).toLocaleString("th-TH", { maximumFractionDigits: 1 }) + "%";
+function esc(v) {
+  return String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+
+/* ----- วันที่: ใช้ข้อความ YYYY-MM-DD เป็นหลัก เพื่อไม่ให้เพี้ยนตามเขตเวลา ----- */
+const DAY = 86400000;
+const dayNum = (s) => Date.UTC(+s.slice(0, 4), +s.slice(5, 7) - 1, +s.slice(8, 10)) / DAY;
+const addDays = (s, n) => new Date((dayNum(s) + n) * DAY).toISOString().slice(0, 10);
+const diffDays = (a, b) => dayNum(a) - dayNum(b);
+const weekday = (s) => new Date(dayNum(s) * DAY).getUTCDay();
+const thDate = (s, opt = { day: "numeric", month: "short", year: "numeric" }) =>
+  new Date(dayNum(s) * DAY).toLocaleDateString("th-TH", { ...opt, timeZone: "UTC" });
+function todayStr() { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; }
+function validYMD(y, m, d) { const t = new Date(Date.UTC(y, m - 1, d)); return t.getUTCFullYear() === y && t.getUTCMonth() === m - 1 && t.getUTCDate() === d; }
+const ymd = (y, m, d) => `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+
+// แปลงวันที่: รับ YYYY-MM-DD หรือ DD/MM/YYYY → { day, fixed } หรือ null
+function parseDay(v) {
+  if (typeof v !== "string") return null;
+  let m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(v.trim());
+  if (m && validYMD(+m[1], +m[2], +m[3])) return { day: ymd(+m[1], +m[2], +m[3]), fixed: false };
+  m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(v.trim());
+  if (m && validYMD(+m[3], +m[2], +m[1])) return { day: ymd(+m[3], +m[2], +m[1]), fixed: true };
+  return null;
+}
+// แปลงวันเวลา: รับ ISO (YYYY-MM-DDTHH:MM…) หรือ DD/MM/YYYY HH:MM → { day, hour, minute, fixed }
+function parseDateTime(v) {
+  if (typeof v !== "string") return null;
+  let m = /^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/.exec(v.trim());
+  if (m && validYMD(+m[1], +m[2], +m[3])) return { day: ymd(+m[1], +m[2], +m[3]), hour: +m[4], minute: +m[5], fixed: false };
+  m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})[ T](\d{1,2}):(\d{2})$/.exec(v.trim());
+  if (m && validYMD(+m[3], +m[2], +m[1])) return { day: ymd(+m[3], +m[2], +m[1]), hour: +m[4], minute: +m[5], fixed: true };
+  return null;
+}
+const isNum = (v) => typeof v === "number" && Number.isFinite(v);
+
+/* =========================================================
+   โหมดมืด/สว่าง (ใช้ค่าที่จำไว้ร่วมกับ Dashboard01)
+   ========================================================= */
+function applyTheme(theme) {
+  document.documentElement.setAttribute("data-theme", theme);
+  const dark = theme === "dark";
+  $("themeIcon").className = "ti " + (dark ? "ti-sun" : "ti-moon");
+  $("themeText").textContent = dark ? "โหมดสว่าง" : "โหมดมืด";
+}
+(function initTheme() {
+  let saved = null;
+  try { saved = localStorage.getItem("drug-dash-theme"); } catch (e) {}
+  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  applyTheme(saved || (prefersDark ? "dark" : "light"));
+})();
+$("themeBtn").addEventListener("click", () => {
+  const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+  applyTheme(next);
+  try { localStorage.setItem("drug-dash-theme", next); } catch (e) {}
+});
+
+/* =========================================================
+   โหลดไฟล์ JSON (ข้อผิดพลาดระดับไฟล์ = หยุดและแสดงกล่องแดง)
+   ========================================================= */
+class LoadError extends Error {
+  constructor(title, details = []) { super(title); this.title = title; this.details = details; }
+}
+async function fetchJson(file) {
+  let res;
+  try { res = await fetch(file, { cache: "no-cache" }); }
+  catch (e) { throw new LoadError(`โหลดไฟล์ ${file} ไม่สำเร็จ`, ["เบราว์เซอร์ไม่สามารถอ่านไฟล์ได้ (" + esc(e.message) + ")"]); }
+  if (!res.ok) {
+    throw new LoadError(res.status === 404 ? `ไม่พบไฟล์ ${file}` : `โหลดไฟล์ ${file} ไม่สำเร็จ`, [
+      "เซิร์ฟเวอร์ตอบกลับด้วยรหัส HTTP <code>" + res.status + (res.statusText ? " " + esc(res.statusText) : "") + "</code>",
+      `ตรวจสอบว่าไฟล์ <code>${esc(file)}</code> อยู่ในโฟลเดอร์เดียวกับหน้านี้`,
+    ]);
+  }
+  const text = await res.text();
+  let data;
+  try { data = JSON.parse(text); }
+  catch (e) { throw new LoadError(`ไฟล์ ${file} ไม่ใช่ JSON ที่ถูกต้อง`, ["รายละเอียด: <code>" + esc(e.message) + "</code>"]); }
+  if (!data || typeof data !== "object" || !Array.isArray(data.items)) {
+    throw new LoadError(`โครงสร้างข้อมูลใน ${file} ไม่ถูกต้อง`, ["ต้องมีฟิลด์ <code>items</code> ที่เป็น array"]);
+  }
+  return data;
+}
+function errorHtml(errors) {
+  let html = errors.map((err) => {
+    const t = err instanceof LoadError ? err.title : "เกิดข้อผิดพลาดที่ไม่คาดคิด";
+    const d = err instanceof LoadError ? err.details : [esc(err && err.message)];
+    return `<h2><i class="ti ti-alert-triangle"></i>${esc(t)}</h2>${d.map((x) => `<p>${x}</p>`).join("")}`;
+  }).join("<hr style='border:0;border-top:1px solid var(--danger-border);margin:10px 0'>");
+  if (location.protocol === "file:") {
+    html += `<p><i class="ti ti-bulb"></i> <strong>คุณกำลังเปิดหน้านี้แบบ <code>file://</code></strong>
+      ซึ่งเบราว์เซอร์ไม่อนุญาตให้ fetch ไฟล์ในเครื่อง กรุณาเปิดผ่าน <strong>Live Server</strong> ใน VS Code
+      หรือ <strong>GitHub Pages</strong></p>`;
+  }
+  return html;
+}
+
+/* =========================================================
+   ตรวจและเตรียมข้อมูลรายแถว (ข้อผิดพลาดระดับแถว = บันทึกไว้ในแท็บคุณภาพข้อมูล)
+   ========================================================= */
+// sev: error = ตัดแถวออก/ใช้ไม่ได้, warn = ใช้ได้แต่ต้องตรวจ, info = แก้อัตโนมัติแล้ว
+function issue(sev, file, ref, msg, action) { ISSUES.push({ sev, file, ref: String(ref ?? "–"), msg, action }); }
+const missingFields = (row, fields) => fields.filter((f) => row[f] === undefined || row[f] === null || String(row[f]).trim() === "");
+
+function prepareDrugs(data) {
+  const f = FILES.drugs;
+  data.items.forEach((d, i) => {
+    const ref = d && d.sku ? d.sku : `แถวที่ ${i + 1}`;
+    const miss = missingFields(d || {}, DRUG_FIELDS);
+    if (miss.length) return issue("error", f, ref, `ขาดฟิลด์ ${miss.join(", ")}`, "ไม่นำมาใช้");
+    if (DRUGS.has(d.sku)) return issue("error", f, ref, "SKU ซ้ำ", "ใช้แถวแรก");
+    DRUGS.set(String(d.sku), d);
+  });
+  const metaCats = Array.isArray(data.meta && data.meta.categories) ? data.meta.categories.map(String) : [];
+  const seen = new Set(metaCats);
+  CATEGORIES = [...metaCats];
+  DRUGS.forEach((d) => { if (!seen.has(d.category)) { seen.add(d.category); CATEGORIES.push(d.category); } });
+}
+
+function prepareStock(data) {
+  const f = FILES.stock;
+  const ids = new Set(), keys = new Map();
+  data.items.forEach((r, i) => {
+    const ref = r && r.stock_id ? r.stock_id : `แถวที่ ${i + 1}`;
+    const miss = missingFields(r || {}, STOCK_FIELDS);
+    if (miss.length) return issue("error", f, ref, `ขาดฟิลด์ ${miss.join(", ")}`, "ไม่นำมาใช้");
+    if (ids.has(r.stock_id)) return issue("error", f, ref, "stock_id ซ้ำ", "ใช้แถวแรก");
+    const drug = DRUGS.get(String(r.sku));
+    if (!drug) return issue("error", f, ref, `SKU ${r.sku} ไม่มีในบัญชียา`, "ไม่นำมาใช้");
+
+    // ล็อตซ้ำ: ถ้าทุกฟิลด์เหมือนกัน (ยกเว้น stock_id) ถือว่าบันทึกซ้ำ
+    const key = r.sku + "|" + r.lot;
+    if (keys.has(key)) {
+      const a = { ...keys.get(key) }, b = { ...r }; delete a.stock_id; delete b.stock_id;
+      if (JSON.stringify(a) === JSON.stringify(b)) return issue("error", f, ref, `บันทึกซ้ำกับ ${keys.get(key).stock_id} (ล็อต ${r.lot})`, "ตัดแถวซ้ำออก");
+      issue("warn", f, ref, `ล็อต ${r.lot} ของ ${r.sku} มีมากกว่า 1 แถว`, "ใช้ทุกแถว");
+    }
+    ids.add(r.stock_id); keys.set(key, r);
+
+    const rec = parseDay(r.received_date);
+    if (!rec) issue("warn", f, ref, `received_date ไม่ถูกต้อง: ${r.received_date}`, "ไม่ใช้วันรับเข้า");
+    else if (rec.fixed) issue("info", f, ref, `received_date เป็นรูปแบบ ${r.received_date}`, `แปลงเป็น ${rec.day}`);
+
+    let expiry = null;
+    if (r.expiry === null || r.expiry === undefined || r.expiry === "") {
+      issue("warn", f, ref, "ไม่มีวันหมดอายุ", "จัดเป็น กักกัน/รอตรวจ ไม่นับเป็นยอดใช้ได้");
+    } else {
+      const ex = parseDay(r.expiry);
+      if (!ex) issue("warn", f, ref, `expiry ไม่ถูกต้อง: ${r.expiry}`, "จัดเป็น กักกัน/รอตรวจ");
+      else {
+        expiry = ex.day;
+        if (ex.fixed) issue("info", f, ref, `expiry เป็นรูปแบบ ${r.expiry}`, `แปลงเป็น ${ex.day}`);
+      }
+    }
+    if (rec && expiry && rec.day > expiry) issue("warn", f, ref, `รับเข้า (${rec.day}) หลังวันหมดอายุ (${expiry}) — วันหมดอายุอาจผิด`, r.status === "quarantine" ? "สถานะกักกันอยู่แล้ว" : "ตรวจสอบกับกล่องยา");
+
+    let qty = r.qty_on_hand;
+    if (!isNum(qty)) return issue("error", f, ref, `qty_on_hand ไม่ใช่ตัวเลข: ${qty}`, "ไม่นำมาใช้");
+    if (qty < 0) { issue("error", f, ref, `qty_on_hand ติดลบ (${qty})`, "นับเป็น 0 — ควรตรวจนับจริง"); qty = 0; }
+
+    let cost = r.unit_cost;
+    if (typeof cost === "string" && cost.trim() !== "" && Number.isFinite(Number(cost))) {
+      issue("info", f, ref, `unit_cost เป็นข้อความ "${cost}"`, `แปลงเป็นตัวเลข ${Number(cost)}`); cost = Number(cost);
+    } else if (!isNum(cost) || cost < 0) { issue("warn", f, ref, `unit_cost ไม่ถูกต้อง: ${cost}`, "นับมูลค่าเป็น 0"); cost = 0; }
+
+    let status = r.status ?? "active";
+    if (!(status in STOCK_STATUS)) { issue("warn", f, ref, `status ไม่รู้จัก: ${status}`, "จัดเป็น กักกัน/รอตรวจ"); }
+
+    const days = expiry ? diffDays(expiry, ASOF) : null;
+    if (status === "active" && days !== null && days < 0 && qty > 0) issue("warn", f, ref, `หมดอายุแล้ว (${expiry}) แต่ยังเป็นสถานะ active และมีของ ${qty}`, "แสดงเป็นหมดอายุแล้ว");
+
+    LOTS.push({ id: r.stock_id, sku: String(r.sku), lot: String(r.lot), drug, received: rec ? rec.day : null, expiry, days, qty, cost, value: qty * cost, status });
+  });
+}
+
+function prepareDispense(data) {
+  const f = FILES.disp;
+  const ids = new Map();
+  const lotMap = new Map(LOTS.map((l) => [l.sku + "|" + l.lot, l]));
+  const lotOwner = new Map();
+  LOTS.forEach((l) => { if (!lotOwner.has(l.lot)) lotOwner.set(l.lot, new Set()); lotOwner.get(l.lot).add(l.sku); });
+
+  data.items.forEach((r, i) => {
+    const ref = r && r.dispense_id ? r.dispense_id : `แถวที่ ${i + 1}`;
+    const miss = missingFields(r || {}, DISP_FIELDS);
+    if (miss.length) return issue("error", f, ref, `ขาดฟิลด์ ${miss.join(", ")}`, "ไม่นำมาใช้");
+    if (ids.has(r.dispense_id)) issue("warn", f, ref, `dispense_id ซ้ำ (${ids.get(r.dispense_id)} รายการ)`, "ใช้ทุกแถว");
+    ids.set(r.dispense_id, (ids.get(r.dispense_id) || 0) + 1);
+    if (r.legacy_id) issue("info", f, ref, `เปลี่ยนรหัสจาก ${r.legacy_id}`, "ใช้รหัสใหม่");
+
+    const dt = parseDateTime(r.datetime);
+    if (!dt) return issue("error", f, ref, `datetime ไม่ถูกต้อง: ${r.datetime}`, "ไม่นำมาใช้");
+    if (dt.fixed) issue("info", f, ref, `datetime เป็นรูปแบบ ${r.datetime}`, `แปลงเป็น ${dt.day} ${String(dt.hour).padStart(2, "0")}:${String(dt.minute).padStart(2, "0")}`);
+
+    const drug = DRUGS.get(String(r.sku));
+    if (!drug) return issue("error", f, ref, `SKU ${r.sku} ไม่มีในบัญชียา`, "ไม่นำมาใช้");
+    if (!isNum(r.qty)) return issue("error", f, ref, `qty ไม่ใช่ตัวเลข: ${r.qty}`, "ไม่นำมาใช้");
+
+    const type = r.type ?? "dispense";
+    const flags = [];            // ป้ายแสดงในตาราง
+    let excluded = false;        // true = ไม่นับในสถิติ
+    if (!(type in DISP_TYPE)) { issue("warn", f, ref, `type ไม่รู้จัก: ${type}`, "ไม่นับในสถิติ"); excluded = true; }
+    if (type === "dispense" && r.qty <= 0) { issue("warn", f, ref, `type=dispense แต่ qty=${r.qty}`, "ไม่นับในสถิติ"); excluded = true; flags.push(["จำนวนผิด", "danger"]); }
+    if (type === "dispense" && !Number.isInteger(r.qty)) { issue("info", f, ref, `จำนวนไม่เต็มหน่วย (${r.qty} ${drug.unit})`, "นับตามที่บันทึก"); flags.push(["ไม่เต็มหน่วย", ""]); }
+    if (dt.day > ASOF) { issue("warn", f, ref, `วันที่ ${dt.day} อยู่หลังวันที่ของข้อมูล (${ASOF})`, "ไม่นับในสถิติ"); excluded = true; flags.push(["วันที่ผิด", "danger"]); }
+
+    const lot = lotMap.get(r.sku + "|" + r.lot) || null;
+    let expiredLot = null;
+    if (!lot) {
+      const owner = lotOwner.get(String(r.lot));
+      issue("warn", f, ref, `ล็อต ${r.lot} ไม่ใช่ล็อตของ ${r.sku}` + (owner ? ` (เป็นล็อตของ ${[...owner].join(", ")})` : " และไม่มีในสต็อก"), "นับในสถิติราย SKU แต่ไม่ผูกกับล็อต");
+      flags.push(["ล็อตไม่ตรง", "warn"]);
+    } else {
+      if (lot.received && dt.day < lot.received) { issue("warn", f, ref, `จ่ายก่อนวันรับล็อตเข้า (${lot.received})`, "ตรวจสอบวันที่"); flags.push(["ก่อนรับเข้า", "warn"]); }
+      if (type === "dispense" && lot.expiry && dt.day > lot.expiry) {
+        expiredLot = { expiry: lot.expiry, late: diffDays(dt.day, lot.expiry) };
+        flags.push([r.incident_ref ? `ยาหมดอายุ · ${r.incident_ref}` : "ยาหมดอายุ", "danger"]);
+      }
+    }
+    if (type === "void") flags.push(["ยกเลิก", ""]);
+
+    // ต้นทุนต่อหน่วย: จากล็อต ถ้าไม่มีใช้ค่าเฉลี่ยของ SKU
+    const skuLots = LOTS.filter((l) => l.sku === r.sku && l.cost > 0);
+    const cost = lot ? lot.cost : skuLots.length ? skuLots.reduce((s, l) => s + l.cost, 0) / skuLots.length : 0;
+
+    DISP.push({
+      id: r.dispense_id, sku: String(r.sku), lot: String(r.lot), drug, qty: r.qty, cost, value: r.qty * cost,
+      day: dt.day, hour: dt.hour, minute: dt.minute, ts: dayNum(dt.day) * 1440 + dt.hour * 60 + dt.minute,
+      patient: r.patient_code ?? null, rx: r.pharmacist_code ?? "ไม่ระบุ", type, incident: r.incident_ref ?? null,
+      excluded, flags, expiredLot,
+    });
+  });
+}
+
+/* =========================================================
+   การกรอง
+   ========================================================= */
+const counted = (r) => r.type === "dispense" && !r.excluded;
+function drugPass(d, ignoreCat) { return ignoreCat || !state.category || d.category === state.category; }
+function qMatch(d, lot) {
+  const q = state.q.trim().toLowerCase();
+  return !q || [d.generic_name, d.sku, d.atc_code, lot || ""].join(" ").toLowerCase().includes(q);
+}
+const lotsFiltered = (ignoreCat) => LOTS.filter((l) => drugPass(l.drug, ignoreCat) && qMatch(l.drug, l.lot));
+const dispFiltered = (ignoreCat) => DISP.filter((r) => r.day >= state.from && r.day <= state.to && drugPass(r.drug, ignoreCat) && qMatch(r.drug, r.lot));
+const periodDays = () => Math.max(1, diffDays(state.to, state.from) + 1);
+const filterSig = () => [state.from, state.to, state.category, state.q, state.nearDays, state.coverDays].join("|");
+
+// สถานะของล็อต ณ วันที่ข้อมูล
+function lotState(l) {
+  if (l.status === "written_off") return "written_off";
+  if (l.status !== "active" || !l.expiry) return "quarantine";
+  if (l.days < 0) return "expired";
+  if (l.days <= state.nearDays) return "near";
+  return "ok";
+}
+const usable = (l) => { const s = lotState(l); return s === "ok" || s === "near"; };
+
+// วิเคราะห์การสั่งซื้อราย SKU (เฉพาะ SKU ที่มีสต็อกหรือมีการจ่าย)
+function orderRows() {
+  const days = periodDays();
+  const by = new Map();
+  const get = (drug) => {
+    if (!by.has(drug.sku)) by.set(drug.sku, { drug, usable: 0, held: 0, used: 0, lots: 0 });
+    return by.get(drug.sku);
+  };
+  lotsFiltered().forEach((l) => {
+    const r = get(l.drug); r.lots++;
+    const s = lotState(l);
+    if (s === "ok" || s === "near") r.usable += l.qty; else if (s === "quarantine") r.held += l.qty;
+  });
+  dispFiltered().filter(counted).forEach((x) => { get(x.drug).used += x.qty; });
+  return [...by.values()].map((r) => {
+    const reorder = Number(r.drug.reorder_level) || 0;
+    const avg = r.used / days;
+    const cover = avg > 0 ? r.usable / avg : Infinity;
+    const need = Math.max(reorder - r.usable, Math.ceil(avg * state.coverDays) - r.usable, 0);
+    let status = "ok";
+    if (r.usable <= 0) status = "out";
+    else if (r.usable < reorder) status = "below";
+    else if (avg > 0 && cover < state.coverDays) status = "cover";
+    else if (avg === 0) status = "idle";
+    return { ...r, sku: r.drug.sku, name: r.drug.generic_name, category: r.drug.category, reorder, avg, cover, need, status, rank: ORDER_STATE[status].rank };
+  });
+}
+
+/* =========================================================
+   วาดทุกส่วน
+   ========================================================= */
+function render() {
+  renderTabs();
+  renderPresets();
+  const fn = { overview: renderOverview, expiry: renderExpiry, dispense: renderDispense, order: renderOrder, quality: renderQuality }[state.tab];
+  fn();
+  $("fFrom").value = state.from; $("fTo").value = state.to;
+  $("fCategory").value = state.category;
+  if ($("fSearch") !== document.activeElement) $("fSearch").value = state.q;
+  document.querySelectorAll(".asof").forEach((el) => {
+    el.innerHTML = `<i class="ti ti-calendar"></i> สต็อก ณ วันที่ <strong>${thDate(ASOF)}</strong>`;
+  });
+}
+
+/* ----- แท็บ พร้อมตัวเลขสรุป ----- */
+function renderTabs() {
+  const lots = lotsFiltered();
+  const attention = lots.filter((l) => { const s = lotState(l); return (s === "expired" && l.qty > 0) || (s === "near" && l.qty > 0) || (s === "quarantine" && l.qty > 0); }).length;
+  const actions = orderRows().filter((r) => ORDER_STATE[r.status].action).length;
+  const probs = ISSUES.filter((i) => i.sev !== "info").length + DISP.filter((r) => r.expiredLot && !r.incident).length;
+  const badges = {
+    dispense: { n: dispFiltered().filter(counted).length, cls: "" },
+    expiry: { n: attention, cls: attention ? "warn" : "" },
+    order: { n: actions, cls: actions ? "danger" : "" },
+    quality: { n: probs, cls: probs ? "warn" : "" },
+  };
+  $("tabs").innerHTML = TABS.map((t) => {
+    const b = badges[t.key], sel = state.tab === t.key;
+    return `<button type="button" class="tab" role="tab" id="tab-${t.key}" data-tab="${t.key}" aria-selected="${sel}"
+      aria-controls="panel-${t.key}" tabindex="${sel ? 0 : -1}"><i class="ti ${t.icon}"></i>${t.label}${b ? ` <span class="badge ${b.cls}">${fmt(b.n)}</span>` : ""}</button>`;
+  }).join("");
+  $("tabs").querySelectorAll(".tab").forEach((el) => el.addEventListener("click", () => switchTab(el.dataset.tab)));
+  TABS.forEach((t) => { $("panel-" + t.key).hidden = t.key !== state.tab; });
+}
+function switchTab(key) {
+  if (!TABS.some((t) => t.key === key)) return;
+  state.tab = key;
+  try { history.replaceState(null, "", "#" + key); } catch (e) {}
+  hideTip(); render();
+}
+$("tabs").addEventListener("keydown", (e) => {
+  if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+  const i = TABS.findIndex((t) => t.key === state.tab);
+  const next = TABS[(i + (e.key === "ArrowRight" ? 1 : TABS.length - 1)) % TABS.length].key;
+  switchTab(next); $("tab-" + next).focus();
+});
+
+/* ----- ปุ่มช่วงเวลาด่วน ----- */
+// n วันล่าสุด (นับถึงวันที่ของข้อมูล) แต่ไม่ก่อนวันแรกที่มีข้อมูล; n = 0 คือทั้งหมด
+function presetRange(n) {
+  if (!n) return { from: RANGE.min, to: RANGE.max };
+  const from = addDays(RANGE.max, -n + 1);
+  return { from: from < RANGE.min ? RANGE.min : from, to: RANGE.max };
+}
+function renderPresets() {
+  $("presets").innerHTML = PRESETS.map((p) => {
+    const r = presetRange(p.n);
+    const on = r.from === state.from && r.to === state.to;
+    return `<button type="button" class="chip-btn ${on ? "active" : ""}" data-n="${p.n}">${p.n ? p.label + "ล่าสุด" : p.label}</button>`;
+  }).join("");
+  $("presets").querySelectorAll(".chip-btn").forEach((b) => b.addEventListener("click", () => {
+    Object.assign(state, presetRange(Number(b.dataset.n))); render();
+  }));
+}
+
+/* ----- การ์ด KPI ----- */
+function kpi(icon, label, value, sub, tone = "") {
+  return `<div class="card kpi"><div class="kpi-label"><span class="kpi-icon ${tone}"><i class="ti ${icon}"></i></span>${label}</div>
+    <div class="kpi-value">${value}</div><div class="kpi-sub">${sub || ""}</div></div>`;
+}
+
+/* =========================================================
+   แท็บ: ภาพรวม
+   ========================================================= */
+function renderOverview() {
+  const disp = dispFiltered().filter(counted);
+  const lots = lotsFiltered();
+  const use = lots.filter(usable);
+  const expired = lots.filter((l) => lotState(l) === "expired" && l.qty > 0);
+  const near = lots.filter((l) => lotState(l) === "near" && l.qty > 0);
+  const actions = orderRows().filter((r) => ORDER_STATE[r.status].action);
+  const patients = new Set(disp.map((r) => r.patient).filter(Boolean)).size;
+  $("ovKpis").innerHTML =
+    kpi("ti-receipt", "จ่ายยา (ครั้ง)", fmt(disp.length), `${fmt(patients)} ผู้รับบริการ · ${fmt(periodDays())} วัน`) +
+    kpi("ti-coin", "มูลค่าสต็อกที่ใช้ได้", money(sumBy(use, "value")), `บาท · ${fmt(use.length)} ล็อต`, "ok") +
+    kpi("ti-calendar-x", "ล็อตหมดอายุ / ใกล้หมดอายุ", `${fmt(expired.length)} / ${fmt(near.length)}`,
+      `มูลค่าเสี่ยง ${money(sumBy(expired, "value") + sumBy(near, "value"))} บาท`, expired.length ? "danger" : "warn") +
+    kpi("ti-shopping-cart", "SKU ที่ต้องสั่งซื้อ", fmt(actions.length), `เป้าหมายพอใช้ ${fmt(state.coverDays)} วัน`, actions.length ? "danger" : "ok");
+  renderDaily($("ovDaily"), $("ovDailyHint"), disp);
+  renderCatBars($("ovCats"));
+  renderStack($("ovStack"), lots, (s) => { state.expView = s; switchTab("expiry"); });
+}
+const sumBy = (arr, k) => arr.reduce((s, x) => s + (x[k] || 0), 0);
+
+/* ----- กราฟแท่งแนวตั้ง: จำนวนครั้งต่อวันในช่วงที่เลือก ----- */
+function renderDaily(box, hintEl, disp) {
+  const n = periodDays();
+  const days = Array.from({ length: n }, (_, i) => addDays(state.from, i));
+  const cnt = new Map(), units = new Map();
+  disp.forEach((r) => { cnt.set(r.day, (cnt.get(r.day) || 0) + 1); units.set(r.day, (units.get(r.day) || 0) + r.qty); });
+  const max = Math.max(1, ...days.map((d) => cnt.get(d) || 0));
+  const avg = disp.length / n;
+  hintEl.textContent = `เฉลี่ย ${fmt(avg, 1)} ครั้ง/วัน · สูงสุด ${fmt(max)}`;
+  const step = Math.ceil(n / 10);
+  box.innerHTML = `<div class="cols" role="img" aria-label="จำนวนครั้งที่จ่ายยารายวัน">${days.map((d) => {
+      const v = cnt.get(d) || 0;
+      return `<div class="col ${v ? "" : "zero"}" data-day="${d}"><div class="col-bar" style="height:${(v / max) * 100}%"></div></div>`;
+    }).join("")}</div>
+    <div class="col-labels">${days.map((d, i) => `<span>${i % step === 0 ? thDate(d, { day: "numeric", month: "short" }) : ""}</span>`).join("")}</div>`;
+  box.querySelectorAll(".col").forEach((el) => {
+    const d = el.dataset.day;
+    el.addEventListener("mousemove", (e) => showTip(`<strong>${WEEKDAYS[weekday(d)]}. ${thDate(d)}</strong>${fmt(cnt.get(d) || 0)} ครั้ง · ${fmt(units.get(d) || 0, 1)} หน่วย`, e.clientX, e.clientY));
+    el.addEventListener("mouseleave", hideTip);
+  });
+}
+
+/* ----- กราฟแท่งแนวนอนแบบใช้ซ้ำ ----- */
+function renderBars(box, rows, { valueText = fmt, valueWidth = 36, tip, onClick, active } = {}) {
+  if (!rows.length) { box.innerHTML = `<div class="empty">ไม่มีข้อมูลในช่วงนี้</div>`; return; }
+  const max = Math.max(...rows.map((r) => r.v)) || 1;
+  box.innerHTML = rows.map((r) => {
+    const cls = active ? (r.key === active ? "active" : "dim") : "";
+    return `<button type="button" class="bar-row ${cls} ${onClick ? "" : "static"}" data-key="${esc(r.key)}">
+      <span class="bar-label" title="${esc(r.label)}">${esc(r.label)}</span>
+      <span class="bar-track"><span class="bar-fill" style="width:calc(${(r.v / max) * 100}% - ${valueWidth}px)"></span><span class="bar-value">${valueText(r.v)}</span></span>
+    </button>`;
+  }).join("");
+  box.querySelectorAll(".bar-row").forEach((el) => {
+    const key = el.dataset.key;
+    if (onClick) el.addEventListener("click", () => { hideTip(); onClick(key); });
+    if (tip) {
+      el.addEventListener("mousemove", (e) => showTip(tip(key), e.clientX, e.clientY));
+      el.addEventListener("mouseleave", hideTip);
+    }
+  });
+}
+
+// การจ่ายยาตามหมวด (ไม่ใช้ตัวกรองหมวด เพื่อให้ยังเห็นหมวดอื่น)
+function renderCatBars(box) {
+  const disp = dispFiltered(true).filter(counted);
+  const by = new Map(), units = new Map();
+  disp.forEach((r) => { by.set(r.drug.category, (by.get(r.drug.category) || 0) + 1); units.set(r.drug.category, (units.get(r.drug.category) || 0) + r.qty); });
+  const rows = CATEGORIES.map((c) => ({ key: c, label: c, v: by.get(c) || 0 }))
+    .filter((r) => r.v > 0 || r.key === state.category).sort((a, b) => b.v - a.v);
+  renderBars(box, rows, {
+    active: state.category,
+    tip: (c) => `<strong>${esc(c)}</strong>${fmt(by.get(c) || 0)} ครั้ง · ${fmt(units.get(c) || 0, 1)} หน่วย`,
+    onClick: (c) => { state.category = state.category === c ? "" : c; render(); },
+  });
+}
+
+/* ----- แท่งซ้อน 100%: สถานะสต็อก (ปริมาณ และ มูลค่า) ----- */
+function renderStack(box, lots, onPick) {
+  const keys = ["ok", "near", "expired", "quarantine"];
+  const b = keys.map((k) => ({ key: k, ...LOT_STATE[k], lots: 0, qty: 0, value: 0 }));
+  lots.filter((l) => l.qty > 0).forEach((l) => {
+    const x = b.find((s) => s.key === lotState(l));
+    if (x) { x.lots++; x.qty += l.qty; x.value += l.value; }
+  });
+  const tq = sumBy(b, "qty"), tv = sumBy(b, "value");
+  if (!tq) { box.innerHTML = `<div class="empty">ไม่มีสต็อกที่ตรงกับตัวกรอง</div>`; return; }
+  const row = (label, sub, f, total, totalText) => `
+    <div class="stack-row"><div class="stack-label">${label}<small>${sub}</small></div>
+      <div class="stack">${b.filter((s) => s[f] > 0).map((s) => `<button type="button" class="stack-seg" data-key="${s.key}"
+        style="width:${(s[f] / total) * 100}%;background:${s.color}">${s[f] / total >= 0.07 ? pct(s[f], total) : ""}</button>`).join("")}</div>
+      <div class="stack-total"><strong>${totalText}</strong>รวม</div></div>`;
+  box.innerHTML = row("ปริมาณ", "หน่วยนับรวมทุกชนิด", "qty", tq, fmt(tq)) + row("มูลค่า", "ต้นทุนคงเหลือ (บาท)", "value", tv, money(tv)) +
+    `<div class="table-wrap status-table"><table><thead><tr><th>สถานะ</th><th class="num">ล็อต</th><th class="num">ปริมาณ</th><th class="num">% ปริมาณ</th><th class="num">มูลค่า</th><th class="num">% มูลค่า</th></tr></thead>
+    <tbody>${b.map((s) => `<tr class="clickable" data-key="${s.key}"><td><span class="swatch" style="background:${s.color}"></span>${s.label}${s.key === "near" ? ` (≤ ${fmt(state.nearDays)} วัน)` : ""}</td>
+      <td class="num">${fmt(s.lots)}</td><td class="num">${fmt(s.qty)}</td><td class="num"><strong>${pct(s.qty, tq)}</strong></td>
+      <td class="num">${money(s.value)}</td><td class="num"><strong>${pct(s.value, tv)}</strong></td></tr>`).join("")}</tbody></table></div>`;
+  box.querySelectorAll("[data-key]").forEach((el) => {
+    const s = b.find((x) => x.key === el.dataset.key);
+    el.addEventListener("click", () => { hideTip(); onPick(s.key); });
+    if (el.classList.contains("stack-seg")) {
+      el.addEventListener("mousemove", (e) => showTip(`<strong>${s.label}</strong>${fmt(s.lots)} ล็อต<br>ปริมาณ ${fmt(s.qty)} (${pct(s.qty, tq)})<br>มูลค่า ${money(s.value)} บาท (${pct(s.value, tv)})`, e.clientX, e.clientY));
+      el.addEventListener("mouseleave", hideTip);
+    }
+  });
+}
+
+/* =========================================================
+   แท็บ: วันหมดอายุ
+   ========================================================= */
+const EXP_VIEWS = { attention: "ต้องดำเนินการ (หมดอายุ / ใกล้หมดอายุ / กักกัน)", expired: "หมดอายุแล้ว", near: "ใกล้หมดอายุ", quarantine: "กักกัน/รอตรวจ", ok: "ปกติ", written_off: "ตัดจำหน่ายแล้ว", all: "ทั้งหมด" };
+function renderExpiry() {
+  const lots = lotsFiltered();
+  const by = (s) => lots.filter((l) => lotState(l) === s && (s === "written_off" || l.qty > 0));
+  const ex = by("expired"), nr = by("near"), qu = by("quarantine"), ok = by("ok");
+  $("expKpis").innerHTML =
+    kpi("ti-calendar-x", "หมดอายุแล้ว (ยังมีของ)", fmt(ex.length), `มูลค่า ${money(sumBy(ex, "value"))} บาท`, "danger") +
+    kpi("ti-hourglass-low", "ใกล้หมดอายุ", fmt(nr.length), `ภายใน ${fmt(state.nearDays)} วัน · ${money(sumBy(nr, "value"))} บาท`, "warn") +
+    kpi("ti-lock", "กักกัน/รอตรวจ", fmt(qu.length), `${fmt(sumBy(qu, "qty"))} หน่วย · ${money(sumBy(qu, "value"))} บาท`) +
+    kpi("ti-circle-check", "ล็อตปกติ", fmt(ok.length), `มูลค่า ${money(sumBy(ok, "value"))} บาท`, "ok");
+  renderStack($("expStack"), lots, (s) => { state.expView = s; render(); });
+
+  $("expView").innerHTML = Object.entries(EXP_VIEWS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
+  $("expView").value = state.expView;
+  const v = state.expView;
+  const rows = lots.filter((l) => {
+    const s = lotState(l);
+    if (v === "all") return true;
+    if (v === "attention") return l.qty > 0 && (s === "expired" || s === "near" || s === "quarantine");
+    return s === v;
+  }).map((l) => ({ ...l, name: l.drug.generic_name, category: l.drug.category, state: lotState(l) }));
+  dataTable($("expTable"), "exp", LOT_COLUMNS, rows, { sig: filterSig() + v, sortKey: "days", sortDir: 1, empty: "ไม่มีล็อตในกลุ่มนี้" });
+}
+const LOT_COLUMNS = [
+  { key: "sku", label: "SKU", html: (l) => `<span class="mono">${esc(l.sku)}</span>` },
+  { key: "name", label: "ชื่อสามัญ", html: (l) => `<strong>${esc(l.name)}</strong> <span class="muted">${esc(l.drug.strength)}</span>` },
+  { key: "category", label: "หมวด", html: (l) => `<span class="pill">${esc(l.category)}</span>` },
+  { key: "lot", label: "ล็อต", html: (l) => `<span class="mono">${esc(l.lot)}</span>` },
+  { key: "received", label: "รับเข้า", html: (l) => (l.received ? thDate(l.received) : "–"), sortVal: (l) => l.received || "" },
+  { key: "expiry", label: "หมดอายุ", html: (l) => (l.expiry ? thDate(l.expiry) : `<span class="tag">ไม่ระบุ</span>`), sortVal: (l) => l.expiry || "9999" },
+  { key: "days", label: "เหลือ (วัน)", num: true, sortVal: (l) => (l.days ?? 1e9), html: (l) => {
+      if (l.days === null) return "–";
+      const tone = l.days < 0 ? "danger" : l.days <= 30 ? "danger" : l.days <= state.nearDays ? "warn" : "";
+      return `<span class="tag ${tone}">${l.days < 0 ? "เกิน " + fmt(-l.days) : fmt(l.days)}</span>`;
+    } },
+  { key: "qty", label: "คงเหลือ", num: true, html: (l) => `${fmt(l.qty)} <span class="muted">${esc(l.drug.unit)}</span>` },
+  { key: "value", label: "มูลค่า", num: true, html: (l) => money(l.value) },
+  { key: "state", label: "สถานะ", html: (l) => `<span class="tag ${LOT_STATE[l.state].tone}">${LOT_STATE[l.state].label}</span>` },
+];
+
+/* =========================================================
+   แท็บ: การจ่ายยา
+   ========================================================= */
+const DSP_VIEWS = { all: "ทั้งหมด", counted: "เฉพาะที่นับในสถิติ", flagged: "เฉพาะรายการที่มีข้อสังเกต", void: "เฉพาะที่ยกเลิก" };
+function renderDispense() {
+  const all = dispFiltered();
+  const disp = all.filter(counted);
+  const patients = new Set(disp.map((r) => r.patient).filter(Boolean)).size;
+  const abx = disp.filter((r) => String(r.drug.atc_code).startsWith("J01")).length;
+  const voids = all.filter((r) => r.type === "void").length;
+  $("dspKpis").innerHTML =
+    kpi("ti-receipt", "จ่ายยา (ครั้ง)", fmt(disp.length), `เฉลี่ย ${fmt(disp.length / periodDays(), 1)} ครั้ง/วัน · ยกเลิก ${fmt(voids)}`) +
+    kpi("ti-pills", "จำนวนหน่วยที่จ่าย", fmt(sumBy(disp, "qty"), 1), `${fmt(new Set(disp.map((r) => r.sku)).size)} SKU`) +
+    kpi("ti-coin", "มูลค่าต้นทุนที่จ่าย", money(sumBy(disp, "value")), "บาท (ตามต้นทุนของล็อต)") +
+    kpi("ti-users", "ผู้รับบริการ", fmt(patients), `ยาปฏิชีวนะ ${pct(abx, disp.length)} ของการจ่าย`, abx / (disp.length || 1) > 0.2 ? "warn" : "");
+  renderDaily($("dspDaily"), $("dspDailyHint"), disp);
+  renderHeatmap($("dspHeat"), disp);
+
+  // 10 อันดับยาที่จ่ายบ่อย
+  const bySku = new Map();
+  disp.forEach((r) => { const x = bySku.get(r.sku) || { n: 0, q: 0, drug: r.drug }; x.n++; x.q += r.qty; bySku.set(r.sku, x); });
+  const top = [...bySku.entries()].sort((a, b) => b[1].n - a[1].n || b[1].q - a[1].q).slice(0, 10)
+    .map(([sku, x]) => ({ key: sku, label: `${x.drug.generic_name} ${x.drug.strength}`, v: x.n }));
+  renderBars($("dspTop"), top, {
+    tip: (sku) => { const x = bySku.get(sku); return `<strong>${esc(x.drug.generic_name)} ${esc(x.drug.strength)}</strong>${esc(sku)} · ${fmt(x.n)} ครั้ง · ${fmt(x.q, 1)} ${esc(x.drug.unit)}`; },
+    onClick: (sku) => { state.q = state.q === sku ? "" : sku; render(); },
+  });
+  renderCatBars($("dspCats"));
+
+  // ตามเภสัชกร
+  const byRx = new Map();
+  disp.forEach((r) => byRx.set(r.rx, (byRx.get(r.rx) || 0) + 1));
+  renderBars($("dspRx"), [...byRx.entries()].sort((a, b) => b[1] - a[1]).map(([k, v]) => ({ key: k, label: k, v })),
+    { tip: (k) => `<strong>${esc(k)}</strong>${fmt(byRx.get(k))} ครั้ง (${pct(byRx.get(k), disp.length)})` });
+
+  // ตาราง
+  $("dspView").innerHTML = Object.entries(DSP_VIEWS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
+  $("dspView").value = state.dspView;
+  const rows = all.filter((r) => ({ all: true, counted: counted(r), flagged: r.flags.length > 0, void: r.type === "void" })[state.dspView])
+    .map((r) => ({ ...r, name: r.drug.generic_name }));
+  dataTable($("dspTable"), "dsp", DSP_COLUMNS, rows, { sig: filterSig() + state.dspView, sortKey: "ts", sortDir: -1, empty: "ไม่มีรายการจ่ายยาในช่วงนี้" });
+}
+const DSP_COLUMNS = [
+  { key: "ts", label: "วันเวลา", html: (r) => `${thDate(r.day, { day: "numeric", month: "short" })} <span class="muted">${String(r.hour).padStart(2, "0")}:${String(r.minute).padStart(2, "0")}</span>` },
+  { key: "id", label: "รหัส", html: (r) => `<span class="mono">${esc(r.id)}</span>` },
+  { key: "sku", label: "SKU", html: (r) => `<span class="mono">${esc(r.sku)}</span>` },
+  { key: "name", label: "ชื่อสามัญ", html: (r) => `<strong>${esc(r.name)}</strong> <span class="muted">${esc(r.drug.strength)}</span>` },
+  { key: "lot", label: "ล็อต", html: (r) => `<span class="mono">${esc(r.lot)}</span>` },
+  { key: "qty", label: "จำนวน", num: true, html: (r) => `${fmt(r.qty, 2)} <span class="muted">${esc(r.drug.unit)}</span>` },
+  { key: "rx", label: "เภสัชกร", html: (r) => esc(r.rx) },
+  { key: "type", label: "ประเภท", html: (r) => `<span class="tag ${r.type === "dispense" ? "ok" : ""}">${esc(DISP_TYPE[r.type] || r.type)}</span>` },
+  { key: "flags", label: "ข้อสังเกต", sortVal: (r) => r.flags.length, html: (r) => r.flags.map(([t, tone]) => `<span class="tag ${tone}">${esc(t)}</span>`).join("") || `<span class="muted">–</span>` },
+];
+
+/* ----- heatmap: วันในสัปดาห์ × ชั่วโมง ----- */
+function renderHeatmap(box, disp) {
+  if (!disp.length) { box.innerHTML = `<div class="empty">ไม่มีข้อมูลในช่วงนี้</div>`; return; }
+  const hours = disp.map((r) => r.hour);
+  const h0 = Math.min(...hours), h1 = Math.max(...hours);
+  const H = Array.from({ length: h1 - h0 + 1 }, (_, i) => h0 + i);
+  const grid = new Map();
+  disp.forEach((r) => { const k = weekday(r.day) + "|" + r.hour; grid.set(k, (grid.get(k) || 0) + 1); });
+  const max = Math.max(...grid.values());
+  let html = `<div class="heat" style="grid-template-columns:34px repeat(${H.length}, minmax(0,1fr))"><span></span>` +
+    H.map((h) => `<span class="heat-h">${h}</span>`).join("");
+  WEEK_ORDER.forEach((wd) => {
+    html += `<span class="heat-d">${WEEKDAYS[wd]}</span>`;
+    H.forEach((h) => {
+      const v = grid.get(wd + "|" + h) || 0;
+      const p = v / max;
+      const bg = v ? `color-mix(in srgb, var(--accent) ${Math.round(18 + 82 * p)}%, var(--surface-2))` : "var(--surface-2)";
+      html += `<span class="heat-cell" data-k="${wd}|${h}" style="background:${bg};color:${p > 0.55 ? "#fff" : "var(--text)"}">${v || ""}</span>`;
+    });
+  });
+  box.innerHTML = html + "</div>";
+  box.querySelectorAll(".heat-cell").forEach((el) => {
+    const [wd, h] = el.dataset.k.split("|").map(Number);
+    el.addEventListener("mousemove", (e) => showTip(`<strong>วัน${["อาทิตย์", "จันทร์", "อังคาร", "พุธ", "พฤหัสบดี", "ศุกร์", "เสาร์"][wd]} ${h}:00–${h}:59</strong>${fmt(grid.get(el.dataset.k) || 0)} ครั้ง`, e.clientX, e.clientY));
+    el.addEventListener("mouseleave", hideTip);
+  });
+}
+
+/* =========================================================
+   แท็บ: การสั่งซื้อ
+   ========================================================= */
+const ORD_VIEWS = { action: "ต้องดำเนินการ", all: "ทั้งหมด", idle: "ไม่มีการจ่ายในช่วงนี้" };
+function renderOrder() {
+  const rows = orderRows();
+  const n = (s) => rows.filter((r) => r.status === s).length;
+  const stocked = new Set(LOTS.map((l) => l.sku));
+  const noStock = [...DRUGS.values()].filter((d) => drugPass(d) && qMatch(d) && !stocked.has(d.sku)).length;
+  $("ordKpis").innerHTML =
+    kpi("ti-package-off", "หมดสต็อก", fmt(n("out")), "ไม่มียอดที่ใช้ได้", "danger") +
+    kpi("ti-arrow-down-bar", "ต่ำกว่าจุดสั่งซื้อ", fmt(n("below")), "ยอดใช้ได้ < reorder_level", "danger") +
+    kpi("ti-hourglass-low", `พอใช้ไม่ถึง ${fmt(state.coverDays)} วัน`, fmt(n("cover")), "ตามอัตราจ่ายในช่วงที่เลือก", "warn") +
+    kpi("ti-zzz", "ไม่มีการจ่ายในช่วงนี้", fmt(n("idle")), "พิจารณาลดการสั่ง/ย้ายสต็อก");
+  $("orderNote").innerHTML = `<i class="ti ti-info-circle"></i> วิเคราะห์ ${fmt(rows.length)} SKU ที่มีข้อมูลสต็อกหรือการจ่าย · อีก ${fmt(noStock)} SKU ในบัญชียาไม่มีข้อมูลสต็อก · ยอดใช้ได้นับเฉพาะล็อต active ที่ยังไม่หมดอายุ`;
+  const v = state.ordView;
+  const shown = rows.filter((r) => v === "all" || (v === "action" ? ORDER_STATE[r.status].action : r.status === v));
+  dataTable($("ordTable"), "ord", ORDER_COLUMNS, shown, { sig: filterSig() + v, sortKey: "rank", sortDir: 1, empty: "ไม่มี SKU ที่ต้องดำเนินการ" });
+}
+const ORDER_COLUMNS = [
+  { key: "sku", label: "SKU", html: (r) => `<span class="mono">${esc(r.sku)}</span>` },
+  { key: "name", label: "ชื่อสามัญ", html: (r) => `<strong>${esc(r.name)}</strong> <span class="muted">${esc(r.drug.strength)}</span>` },
+  { key: "category", label: "หมวด", html: (r) => `<span class="pill">${esc(r.category)}</span>` },
+  { key: "usable", label: "คงเหลือใช้ได้", num: true, html: (r) => `${fmt(r.usable)} <span class="muted">${esc(r.drug.unit)}</span>` + (r.held ? `<br><span class="muted">+ กักกัน ${fmt(r.held)}</span>` : "") },
+  { key: "used", label: "จ่ายในช่วงนี้", num: true, html: (r) => fmt(r.used, 1) },
+  { key: "avg", label: "เฉลี่ย/วัน", num: true, html: (r) => fmt(r.avg, 1) },
+  { key: "cover", label: "พอใช้ (วัน)", num: true, sortVal: (r) => (r.cover === Infinity ? 1e9 : r.cover), html: (r) => {
+      if (r.cover === Infinity) return `<span class="muted">–</span>`;
+      const tone = r.cover < state.coverDays / 2 ? "danger" : r.cover < state.coverDays ? "warn" : "ok";
+      return `<span class="tag ${tone}">${fmt(r.cover, 0)}</span>`;
+    } },
+  { key: "reorder", label: "จุดสั่งซื้อ", num: true, html: (r) => {
+      const p = r.reorder ? Math.min(100, (r.usable / r.reorder) * 100) : 100;
+      const tone = r.usable < r.reorder ? (r.usable <= 0 ? "danger" : "warn") : "";
+      return `<span class="level"><span class="level-track"><span class="level-fill ${tone}" style="width:${p}%"></span></span>${fmt(r.reorder)}</span>`;
+    } },
+  { key: "need", label: "แนะนำสั่ง", num: true, html: (r) => (r.need > 0 ? `<strong>${fmt(r.need)}</strong>` : `<span class="muted">–</span>`) },
+  { key: "rank", label: "สถานะ", html: (r) => `<span class="tag ${ORDER_STATE[r.status].tone}">${ORDER_STATE[r.status].label}</span>` },
+];
+
+/* =========================================================
+   แท็บ: คุณภาพข้อมูล (ทั้งชุด ไม่ขึ้นกับตัวกรอง)
+   ========================================================= */
+function renderQuality() {
+  const c = (s) => ISSUES.filter((i) => i.sev === s).length;
+  const safety = DISP.filter((r) => r.expiredLot);
+  const unreported = safety.filter((r) => !r.incident).length;
+  $("qKpis").innerHTML =
+    kpi("ti-shield-exclamation", "จ่ายยาหมดอายุ", fmt(safety.length), unreported ? `ไม่มีรายงานเหตุการณ์ ${fmt(unreported)} ครั้ง` : "มีรายงานเหตุการณ์ครบทุกครั้ง", "danger") +
+    kpi("ti-circle-x", "ผิดพลาด", fmt(c("error")), "ข้อมูลถูกตัดออกหรือปรับค่า", "danger") +
+    kpi("ti-alert-triangle", "ต้องตรวจสอบ", fmt(c("warn")), "ใช้ได้แต่ควรยืนยันกับของจริง", "warn") +
+    kpi("ti-wand", "แก้อัตโนมัติ/ข้อมูล", fmt(c("info")), "เช่น แปลงรูปแบบวันที่");
+
+  dataTable($("safetyTable"), "safety", SAFETY_COLUMNS, safety.map((r) => ({ ...r, name: r.drug.generic_name, late: r.expiredLot.late })),
+    { sig: "safety", sortKey: "ts", sortDir: 1, empty: "ไม่พบการจ่ายยาจากล็อตที่หมดอายุ" });
+
+  $("qView").innerHTML = [["all", "ทั้งหมด"], ...Object.entries(SEV).map(([k, v]) => [k, v.label])].map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
+  $("qView").value = state.qView;
+  const rows = ISSUES.filter((i) => state.qView === "all" || i.sev === state.qView).map((i) => ({ ...i, rank: SEV[i.sev].rank }));
+  dataTable($("qTable"), "q", ISSUE_COLUMNS, rows, { sig: state.qView, sortKey: "rank", sortDir: 1, empty: "ไม่พบปัญหาในข้อมูล 🎉" });
+}
+const SAFETY_COLUMNS = [
+  { key: "ts", label: "วันที่จ่าย", html: (r) => thDate(r.day) },
+  { key: "id", label: "รหัส", html: (r) => `<span class="mono">${esc(r.id)}</span>` },
+  { key: "name", label: "ยา", html: (r) => `<strong>${esc(r.name)}</strong> <span class="muted">${esc(r.drug.strength)}</span>` },
+  { key: "lot", label: "ล็อต", html: (r) => `<span class="mono">${esc(r.lot)}</span>` },
+  { key: "expiry", label: "หมดอายุ", sortVal: (r) => r.expiredLot.expiry, html: (r) => thDate(r.expiredLot.expiry) },
+  { key: "late", label: "เกินมา (วัน)", num: true, html: (r) => `<span class="tag danger">${fmt(r.late)}</span>` },
+  { key: "rx", label: "เภสัชกร", html: (r) => esc(r.rx) },
+  { key: "incident", label: "รายงานเหตุการณ์", sortVal: (r) => r.incident || "", html: (r) => (r.incident ? `<span class="tag info">${esc(r.incident)}</span>` : `<span class="tag danger">ยังไม่มีรายงาน</span>`) },
+];
+const ISSUE_COLUMNS = [
+  { key: "rank", label: "ระดับ", html: (i) => `<span class="tag ${SEV[i.sev].tone}">${SEV[i.sev].label}</span>` },
+  { key: "file", label: "ไฟล์", html: (i) => `<span class="mono">${esc(i.file)}</span>` },
+  { key: "ref", label: "รายการ", html: (i) => `<span class="mono">${esc(i.ref)}</span>` },
+  { key: "msg", label: "ปัญหา", wrap: true, html: (i) => esc(i.msg) },
+  { key: "action", label: "การจัดการ", wrap: true, html: (i) => esc(i.action) },
+];
+
+/* =========================================================
+   ตารางแบบใช้ซ้ำ: เรียงลำดับ + แบ่งหน้า (เหมือน Dashboard01)
+   ========================================================= */
+function dataTable(el, id, columns, rows, opts = {}) {
+  const t = tables[id] || (tables[id] = { sortKey: opts.sortKey ?? null, sortDir: opts.sortDir ?? 1, page: 1, pageSize: 10, sig: null });
+  const redraw = () => dataTable(el, id, columns, rows, opts);
+  const sig = [opts.sig, t.sortKey, t.sortDir, t.pageSize].join("|");
+  if (sig !== t.sig) { t.page = 1; t.sig = sig; }
+
+  const sorted = rows.slice();
+  const col = columns.find((c) => c.key === t.sortKey);
+  if (col) {
+    const val = col.sortVal || ((r) => r[col.key]);
+    sorted.sort((a, b) => {
+      const x = val(a), y = val(b);
+      const r = typeof x === "number" && typeof y === "number" ? x - y : String(x ?? "").localeCompare(String(y ?? ""), "th", { numeric: true });
+      return r * t.sortDir;
+    });
+  }
+  const size = t.pageSize > 0 ? t.pageSize : Math.max(sorted.length, 1);
+  const pages = Math.max(1, Math.ceil(sorted.length / size));
+  t.page = Math.min(Math.max(1, t.page), pages);
+  const start = (t.page - 1) * size;
+  const pageRows = sorted.slice(start, start + size);
+
+  const head = columns.map((c) => {
+    const on = t.sortKey === c.key;
+    const icon = on ? (t.sortDir === 1 ? "ti-sort-ascending" : "ti-sort-descending") : "ti-arrows-sort";
+    return `<th class="${c.num ? "num" : ""} ${on ? "sorted" : ""}" data-key="${c.key}" tabindex="0"
+      aria-sort="${on ? (t.sortDir === 1 ? "ascending" : "descending") : "none"}">${c.label} <i class="ti ${icon}"></i></th>`;
+  }).join("");
+  const body = pageRows.length
+    ? pageRows.map((r) => `<tr class="${r.type === "void" ? "muted-row" : ""}">${columns.map((c) =>
+        `<td class="${c.num ? "num" : ""} ${c.wrap ? "wrap" : ""}">${c.html ? c.html(r) : esc(r[c.key])}</td>`).join("")}</tr>`).join("")
+    : `<tr><td colspan="${columns.length}" class="no-result"><i class="ti ti-mood-empty"></i> ${esc(opts.empty || "ไม่พบรายการ")}</td></tr>`;
+
+  el.innerHTML = `<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${body}</tbody></table></div>
+    <nav class="pager" aria-label="เปลี่ยนหน้า">${sorted.length ? pagerHtml(t, sorted.length, start, pageRows.length, pages) : ""}</nav>`;
+
+  el.querySelectorAll("th").forEach((th) => {
+    const sort = () => {
+      const k = th.dataset.key;
+      if (t.sortKey === k) t.sortDir *= -1; else { t.sortKey = k; t.sortDir = 1; }
+      redraw();
+    };
+    th.addEventListener("click", sort);
+    th.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); sort(); } });
+  });
+  el.querySelectorAll(".pg[data-page]").forEach((b) => b.addEventListener("click", () => { t.page = Number(b.dataset.page); redraw(); }));
+  const sizeSel = el.querySelector(".page-size-sel");
+  if (sizeSel) sizeSel.addEventListener("change", () => { t.pageSize = Number(sizeSel.value); redraw(); });
+}
+function pagerHtml(t, total, start, count, pages) {
+  const cur = t.page, nums = [];
+  for (let p = 1; p <= pages; p++) {
+    if (p === 1 || p === pages || Math.abs(p - cur) <= 1) nums.push(p);
+    else if (nums[nums.length - 1] !== "…") nums.push("…");
+  }
+  const btn = (label, page, o = {}) => `<button type="button" class="pg ${o.current ? "current" : ""}" data-page="${page}"
+    ${o.disabled ? "disabled" : ""} ${o.current ? 'aria-current="page"' : ""} aria-label="${o.aria || "หน้า " + page}">${label}</button>`;
+  const sizes = [10, 25, 50, 0].map((n) => `<option value="${n}" ${t.pageSize === n ? "selected" : ""}>${n || "ทั้งหมด"}</option>`).join("");
+  return `<div class="pager-info"><span>แสดง ${fmt(start + 1)}–${fmt(start + count)} จาก ${fmt(total)} รายการ</span>
+      <label>ต่อหน้า <select class="page-size-sel" aria-label="จำนวนรายการต่อหน้า">${sizes}</select></label></div>
+    <div class="pager-btns">
+      ${btn('<i class="ti ti-chevrons-left"></i>', 1, { disabled: cur === 1, aria: "หน้าแรก" })}
+      ${btn('<i class="ti ti-chevron-left"></i>', cur - 1, { disabled: cur === 1, aria: "หน้าก่อนหน้า" })}
+      ${nums.map((p) => (p === "…" ? `<span class="pg-gap">…</span>` : btn(p, p, { current: p === cur }))).join("")}
+      ${btn('<i class="ti ti-chevron-right"></i>', cur + 1, { disabled: cur === pages, aria: "หน้าถัดไป" })}
+      ${btn('<i class="ti ti-chevrons-right"></i>', pages, { disabled: cur === pages, aria: "หน้าสุดท้าย" })}
+    </div>`;
+}
+
+/* =========================================================
+   tooltip
+   ========================================================= */
+const tip = $("tooltip");
+function showTip(html, x, y) {
+  tip.innerHTML = html; tip.classList.add("show");
+  const pad = 14, w = tip.offsetWidth, h = tip.offsetHeight;
+  let left = x + pad, top = y + pad;
+  if (left + w > window.innerWidth - 8) left = x - w - pad;
+  if (top + h > window.innerHeight - 8) top = y - h - pad;
+  tip.style.left = Math.max(8, left) + "px"; tip.style.top = Math.max(8, top) + "px";
+}
+function hideTip() { tip.classList.remove("show"); }
+
+/* =========================================================
+   ตัวควบคุม: สร้างตัวเลือกและผูกเหตุการณ์
+   ========================================================= */
+function buildControls() {
+  const catCount = new Map();
+  DRUGS.forEach((d) => catCount.set(d.category, (catCount.get(d.category) || 0) + 1));
+  $("fCategory").innerHTML = `<option value="">ทุกหมวด (${fmt(CATEGORIES.length)})</option>` +
+    CATEGORIES.map((c) => `<option value="${esc(c)}">${esc(c)} (${fmt(catCount.get(c) || 0)})</option>`).join("");
+  ["fFrom", "fTo"].forEach((id) => { $(id).min = RANGE.min; $(id).max = RANGE.max; });
+  $("nearDays").innerHTML = [30, 60, 90, 180, 365].map((d) => `<option value="${d}">${fmt(d)} วัน</option>`).join("");
+  $("nearDays").value = String(state.nearDays);
+  $("coverDays").innerHTML = [14, 30, 60, 90].map((d) => `<option value="${d}">พอใช้ ${fmt(d)} วัน</option>`).join("");
+  $("coverDays").value = String(state.coverDays);
+  $("ordView").innerHTML = Object.entries(ORD_VIEWS).map(([k, v]) => `<option value="${k}">${v}</option>`).join("");
+
+  const onDate = () => {
+    let a = $("fFrom").value || RANGE.min, b = $("fTo").value || RANGE.max;
+    if (a > b) [a, b] = [b, a];               // สลับถ้ากรอกกลับด้าน
+    state.from = a; state.to = b; render();
+  };
+  $("fFrom").addEventListener("change", onDate);
+  $("fTo").addEventListener("change", onDate);
+  $("fCategory").addEventListener("change", (e) => { state.category = e.target.value; render(); });
+  $("fSearch").addEventListener("input", (e) => { state.q = e.target.value; render(); });
+  $("nearDays").addEventListener("change", (e) => { state.nearDays = Number(e.target.value); render(); });
+  $("coverDays").addEventListener("change", (e) => { state.coverDays = Number(e.target.value); render(); });
+  $("expView").addEventListener("change", (e) => { state.expView = e.target.value; render(); });
+  $("dspView").addEventListener("change", (e) => { state.dspView = e.target.value; render(); });
+  $("ordView").addEventListener("change", (e) => { state.ordView = e.target.value; render(); });
+  $("qView").addEventListener("change", (e) => { state.qView = e.target.value; render(); });
+  $("clearBtn").addEventListener("click", () => {
+    Object.assign(state, { category: "", q: "", from: RANGE.min, to: RANGE.max });
+    $("fSearch").value = ""; render();
+  });
+}
+
+/* =========================================================
+   เริ่มต้นการทำงาน
+   ========================================================= */
+(async function init() {
+  // โหลดทั้ง 3 ไฟล์พร้อมกัน และรวบรวมข้อผิดพลาดของทุกไฟล์มาแสดงทีเดียว
+  const results = await Promise.allSettled([fetchJson(FILES.drugs), fetchJson(FILES.stock), fetchJson(FILES.disp)]);
+  const errors = results.filter((r) => r.status === "rejected").map((r) => r.reason);
+  if (errors.length) {
+    $("loading").classList.add("hidden");
+    $("errorBox").innerHTML = errorHtml(errors);
+    $("errorBox").classList.remove("hidden");
+    return;
+  }
+  try {
+    const [drugs, stock, disp] = results.map((r) => r.value);
+    META = { drugs: drugs.meta || {}, stock: stock.meta || {}, disp: disp.meta || {} };
+
+    // วันที่ของข้อมูล: stock.meta.as_of → dispense.meta.as_of → วันนี้
+    const asofs = [META.stock.as_of, META.disp.as_of].map(parseDay).filter(Boolean).map((x) => x.day);
+    ASOF = asofs[0] || todayStr();
+    if (asofs.length > 1 && asofs[0] !== asofs[1]) issue("warn", "meta", "as_of", `วันที่ข้อมูลไม่ตรงกัน: stock ${asofs[0]} / dispense ${asofs[1]}`, `ใช้ ${ASOF}`);
+
+    prepareDrugs(drugs);
+    prepareStock(stock);
+    prepareDispense(disp);
+
+    // ช่วงวันที่: จากรายการจ่ายที่นับได้ ถึงวันที่ของข้อมูล
+    const days = DISP.filter((r) => !r.excluded).map((r) => r.day).sort();
+    RANGE = { min: days[0] || addDays(ASOF, -29), max: ASOF };
+    state.from = RANGE.min; state.to = RANGE.max;
+
+    // ส่วนหัว
+    $("heroStats").innerHTML =
+      `<span class="hero-chip"><i class="ti ti-calendar"></i>ข้อมูล ณ <strong>${thDate(ASOF)}</strong></span>` +
+      `<span class="hero-chip"><i class="ti ti-receipt"></i>การจ่ายยา <strong>${thDate(RANGE.min, { day: "numeric", month: "short" })} – ${thDate(RANGE.max)}</strong></span>`;
+    $("note").textContent = META.disp.note || META.stock.note || "";
+
+    const hash = location.hash.replace("#", "");
+    if (TABS.some((t) => t.key === hash)) state.tab = hash;
+
+    buildControls();
+    $("loading").classList.add("hidden");
+    $("app").classList.remove("hidden");
+    render();
+  } catch (err) {
+    console.error(err);
+    $("loading").classList.add("hidden");
+    $("errorBox").innerHTML = errorHtml([err]);
+    $("errorBox").classList.remove("hidden");
+  }
+})();
+</script>
+</body>
+</html>
